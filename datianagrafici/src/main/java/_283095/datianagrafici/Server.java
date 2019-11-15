@@ -7,41 +7,50 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server {
+public class Server
+{
 
-	static final int server_port = 7777;
-	
-	Server(){
-		System.out.println("Server starting...");
-		Reply();
-	}
-	
-	public static void main(String[] args) {
-		@SuppressWarnings("unused")
-		Server server = new Server();
-	}
-	
-	/*
-	 *il server aspetta che un client si connetta, dopodichè manda un stringa "Received"
-	*/	
-	public void Reply() {
-		System.out.println("Waiting for something to reply at...");
-		try {
-			ServerSocket server = new ServerSocket(server_port);	//crea socket
-			Socket client = server.accept();	//aspetta che gli arrivino richieste dal client
+  static final int server_port = 7777;
 
-			BufferedReader is = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			DataOutputStream os = new DataOutputStream(client.getOutputStream());
+  Server()
+  {
+    System.out.println("Server starting...");
+    Reply();
+  }
 
-			System.out.println("Server received : " + is.readLine());
-			// server reply
-			os.writeBytes("Received\n");
+  public static void main(String[] args)
+  {
+    @SuppressWarnings("unused")
+    Server server = new Server();
+  }
 
-			client.close();
-			server.close();
+  /*
+   *il server aspetta che un client si connetta, dopodichè manda un stringa "Received"
+  */
+  public void Reply()
+  {
+    System.out.println("Waiting for something to reply at...");
+    try
+    {
+      ServerSocket server = new ServerSocket(server_port); // crea socket
+      Socket client = server.accept(); // aspetta che gli arrivino richieste dal
+                                       // client
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+      BufferedReader is = new BufferedReader(
+          new InputStreamReader(client.getInputStream()));
+      DataOutputStream os = new DataOutputStream(client.getOutputStream());
+
+      System.out.println("Server received : " + is.readLine());
+      // server reply
+      os.writeBytes("Received\n");
+
+      client.close();
+      server.close();
+
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
 }
