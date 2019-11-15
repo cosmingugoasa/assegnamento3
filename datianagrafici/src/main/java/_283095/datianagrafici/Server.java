@@ -21,8 +21,11 @@ public class Server {
 		Server server = new Server();
 	}
 	
+	/*
+	 *il server aspetta che un client si connetta, dopodichè manda un stringa "Received"
+	*/	
 	public void Reply() {
-		System.out.println("Server trying to Reply...");
+		System.out.println("Waiting for something to reply at...");
 		try {
 			ServerSocket server = new ServerSocket(server_port);	//crea socket
 			Socket client = server.accept();	//aspetta che gli arrivino richieste dal client

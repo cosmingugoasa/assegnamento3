@@ -20,6 +20,9 @@ public class Client {
 		Client cliente = new Client();
 	}
 	
+	/*
+	 * il client tenta una connessione al server all indirizzo-porta di default
+	 */
 	public void Reach() {
 		System.out.println("Client trying to reach...");
 		try {
