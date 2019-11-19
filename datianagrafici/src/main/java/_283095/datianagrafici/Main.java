@@ -9,41 +9,77 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main {
+public class Main
+{
 
-	public static void main(String[] args) throws IOException, ParseException {
+  public static void main(String[] args) throws IOException, ParseException
+  {
 
-		// Leggo da file e creo un gruppo di sedi ed un gruppo di impiegati.
+    // Leggo da file e creo un gruppo di sedi ed un gruppo di impiegati.
 
-		List<Impiegato> employeesList = new ArrayList<Impiegato>();	//lista impiegati 
-		List<Sede> HqList = new ArrayList<Sede>();	//lista sedi
-		String[] data;
-		String line;
-		BufferedReader csvReader;
+    List<Impiegato> employeesList = new ArrayList<Impiegato>(); // lista
+                                                                // impiegati
+    List<Sede> HqList = new ArrayList<Sede>(); // lista sedi
+    String[] data;
+    String line;
+    BufferedReader csvReader;
 
-		try {
+    try
+    {
 
-			csvReader = new BufferedReader(new FileReader("Impiegati.csv"));
+      csvReader = new BufferedReader(new FileReader("Impiegati.csv"));
 
-			while ((line = csvReader.readLine()) != null) {
-				data = line.split(",");
-				employeesList.add(new Impiegato(data[0], data[1], data[2], data[3], data[4],
-						new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
-						new SimpleDateFormat("dd/MM/yyyy").parse(data[6])));
-			}
+      while ((line = csvReader.readLine()) != null)
+      {
+        data = line.split(",");
+        switch (data[4])
+        {
+          case "Operaio":
+            employeesList.add(new Operaio(data[0], data[1], data[2], data[3],
+                new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
+                new SimpleDateFormat("dd/MM/yyyy").parse(data[6])));
+            break;
+          case "Funzionario":
+            employeesList.add(new Funzionario(data[0], data[1], data[2],
+                data[3], new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
+                new SimpleDateFormat("dd/MM/yyyy").parse(data[6]), data[7],
+                data[8]));
+            break;
+          case "Dirigente":
+            employeesList.add(new Dirigente(data[0], data[1], data[2], data[3],
+                new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
+                new SimpleDateFormat("dd/MM/yyyy").parse(data[6]), data[7],
+                data[8]));
+            break;
+          case "Amministratore":
+            employeesList.add(new Amministratore(data[0], data[1], data[2],
+                data[3], new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
+                new SimpleDateFormat("dd/MM/yyyy").parse(data[6]), data[7],
+                data[8]));
+            break;
+        }
+      }
 
-			csvReader = new BufferedReader(new FileReader("Sedi.csv"));
+      csvReader = new BufferedReader(new FileReader("Sedi.csv"));
 
-			while ((line = csvReader.readLine()) != null) {
-				data = line.split(",");
-				HqList.add(new Sede(data[0], data[1]));
-			}
+      while ((line = csvReader.readLine()) != null)
+      {
+        data = line.split(",");
+        HqList.add(new Sede(data[0], data[1]));
+      }
 
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+      for (Impiegato item : employeesList)
+      {
+        item.printDetails();
+      }
+
+    }
+    catch (FileNotFoundException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+  }
 
 }
