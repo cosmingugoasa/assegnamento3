@@ -2,6 +2,7 @@ package _283095.datianagrafici;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Random;
 
 public class Client {
 	static final int server_port = 7777;
@@ -28,18 +29,21 @@ public class Client {
 			DataOutputStream _os = new DataOutputStream(server.getOutputStream());
 			
 			//os.writeBytes("Client Reaching...\n");
-			_os.writeUTF("Client Reaching...\n");
+			_os.writeUTF("client reaching...\n");
 
-			System.out.println("Client received : " + _is.readUTF());
+			System.out.println("received : " + _is.readUTF());
 			
-			while(true) {
+			/*while(true) {
 			  System.out.println(_is.readUTF());
-			  _os.writeUTF("Hey ! I'm client " + Math.random());
-			}
+			  _os.writeUTF("Hey ! I'm client " + new Random().nextInt(10));
+			}*/
+			
+			System.out.println(_is.readUTF());
+      _os.writeUTF("Hey ! I'm client " + new Random().nextInt(10));
 			
 			//server.close();
 		} catch (IOException e) {
-		  e.printStackTrace();
+		  System.out.println("Server non raggiungibile.");
 		}
 	}
 }
