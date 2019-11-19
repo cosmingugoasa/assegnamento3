@@ -1,4 +1,8 @@
 eclipse.preferences.version=1
 formatter_profile=_poggi
+<<<<<<< HEAD
 formatter_settings_version=16
 org.eclipse.jdt.ui.text.custom_code_templates=
+=======
+formatter_settings_version=17
+>>>>>>> develop
