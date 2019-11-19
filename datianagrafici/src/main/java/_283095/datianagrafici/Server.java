@@ -1,9 +1,6 @@
 package _283095.datianagrafici;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -12,13 +9,13 @@ public class Server
 
   static final int server_port = 7777;
 
-  Server()
+  Server() throws Exception
   {
     System.out.println("Server starting...");
     Reply();
   }
 
-  public static void main(String[] args)
+  public static void main(String[] args) throws Exception
   {
     @SuppressWarnings("unused")
     Server server = new Server();
@@ -27,30 +24,38 @@ public class Server
   /*
    *il server aspetta che un client si connetta, dopodichè manda un stringa "Received"
   */
-  public void Reply()
+  public void Reply() throws Exception
   {
     System.out.println("Waiting for something to reply at...");
-    try
+    ServerSocket server = new ServerSocket(server_port); // crea socket
+    while (true)
     {
-      ServerSocket server = new ServerSocket(server_port); // crea socket
-      Socket client = server.accept(); // aspetta che gli arrivino richieste dal
-                                       // client
+      
+      Socket client = null; // aspetta che gli arrivino richieste
+                            // dal
+                            // client
+      
+      try
+      {
+        client = server.accept();        
+        
+        DataInputStream _is = new DataInputStream(client.getInputStream());
+        DataOutputStream _os = new DataOutputStream(client.getOutputStream());
 
-      BufferedReader is = new BufferedReader(
-          new InputStreamReader(client.getInputStream()));
-      DataOutputStream os = new DataOutputStream(client.getOutputStream());
+        System.out.println("Server received : " + _is.readUTF());
+        // server replies to client
+        _os.writeUTF("Received\n");
 
-      System.out.println("Server received : " + is.readLine());
-      // server reply
-      os.writeBytes("Received\n");
-
-      client.close();
-      server.close();
-
-    }
-    catch (IOException e)
-    {
-      e.printStackTrace();
+        //creo nuovo thread per il client che si è connesso
+        Thread _ch = new ConnectionHandler(client, _is, _os);
+        _ch.start();
+        
+      }
+      catch (IOException e)
+      {
+        client.close();
+        e.printStackTrace();
+      }
     }
   }
 }

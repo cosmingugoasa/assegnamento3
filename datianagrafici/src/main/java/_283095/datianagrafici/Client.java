@@ -1,9 +1,6 @@
 package _283095.datianagrafici;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 
 public class Client {
@@ -26,16 +23,23 @@ public class Client {
 	public void Reach() {
 		System.out.println("Client trying to reach...");
 		try {
-			Socket client = new Socket(server_host, server_port);
-			BufferedReader is = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			DataOutputStream os = new DataOutputStream(client.getOutputStream());
+			Socket server = new Socket(server_host, server_port);
+			DataInputStream _is = new DataInputStream(server.getInputStream());
+			DataOutputStream _os = new DataOutputStream(server.getOutputStream());
+			
+			//os.writeBytes("Client Reaching...\n");
+			_os.writeUTF("Client Reaching...\n");
 
-			os.writeBytes("Client Reaching...\n");
-
-			System.out.println("Client received: " + is.readLine());
-			client.close();
+			System.out.println("Client received : " + _is.readUTF());
+			
+			while(true) {
+			  System.out.println(_is.readUTF());
+			  _os.writeUTF("Hey ! I'm client " + Math.random());
+			}
+			
+			//server.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+		  e.printStackTrace();
 		}
 	}
 }
