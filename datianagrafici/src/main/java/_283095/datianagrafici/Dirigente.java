@@ -15,4 +15,10 @@ public class Dirigente extends Impiegato
     email = _email;
     psw = _psw;
   }
+
+  public String search(String _job)
+  { 
+    return "Search," + _job;
+  }
+
 }
