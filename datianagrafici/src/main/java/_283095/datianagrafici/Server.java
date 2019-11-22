@@ -30,15 +30,15 @@ public class Server
     ServerSocket server = new ServerSocket(server_port); // crea socket
     while (true)
     {
-      
+
       Socket client = null; // aspetta che gli arrivino richieste
                             // dal
                             // client
-      
+
       try
       {
-        client = server.accept();        
-        
+        client = server.accept();
+
         DataInputStream _is = new DataInputStream(client.getInputStream());
         DataOutputStream _os = new DataOutputStream(client.getOutputStream());
 
@@ -46,10 +46,10 @@ public class Server
         // server replies to client
         _os.writeUTF("Received\n");
 
-        //creo nuovo thread per il client che si è connesso
+        // creo nuovo thread per il client che si è connesso
         Thread _ch = new ConnectionHandler(client, _is, _os);
         _ch.start();
-        
+
       }
       catch (IOException e)
       {

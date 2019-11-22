@@ -83,9 +83,8 @@ public class ConnectionHandler extends Thread
             "Tax code:" + item.taxCode + "\nJob:" + item.job + "\n\n");
       }
 
-      
       System.out.println(inputStream.readUTF());
-      
+
     }
     catch (IOException e)
     {
