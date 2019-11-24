@@ -38,13 +38,13 @@ public class ConnectionHandler extends Thread
       
       System.out.println(inputStream.readUTF());
       outputStream.writeUTF("Hi, i'm server");
-      
-      Packet _p = (Packet)ois.readObject();
-      if(_p != null) {
-        System.out.println(_p.action);
-        oos.writeObject(new Packet("response", 2));
+      while(true) {
+        Packet _p = (Packet)ois.readObject();
+        if(_p != null) {
+          System.out.println(_p.getAction());
+          oos.writeObject(new Packet("response", new Impiegato()));
+        }
       }
-      
     }
     catch (IOException | ClassNotFoundException e)
     {

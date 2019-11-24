@@ -1,8 +1,9 @@
 package _283095.datianagrafici;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Impiegato
+public class Impiegato implements Serializable
 {
 
   String name;
@@ -12,7 +13,7 @@ public class Impiegato
   String job;
   Date start;
   Date end;
-
+  
   Impiegato()
   {
     name = "";

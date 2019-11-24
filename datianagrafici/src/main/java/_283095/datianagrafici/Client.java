@@ -11,7 +11,7 @@ public class Client
   static Socket server = null;
   static DataInputStream is = null;
   static DataOutputStream os = null;
-  
+
   Funzionario fuser = null;
   Dirigente duser = null;
   Amministratore auser = null;
@@ -22,7 +22,8 @@ public class Client
     Connect();
   }
 
-  public static void main(String[] args) throws ClassNotFoundException, IOException
+  public static void main(String[] args)
+      throws ClassNotFoundException, IOException
   {
     @SuppressWarnings("unused")
     Client client = new Client();
@@ -41,27 +42,53 @@ public class Client
       os = new DataOutputStream(server.getOutputStream());
       ObjectOutputStream oos = new ObjectOutputStream(server.getOutputStream());
       ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
-      
+
       os.writeUTF("Hey ! I'm client " + new Random().nextInt(10));
       System.out.println(is.readUTF());
       
-      Packet _p = new Packet("requst", 1);
+      Login(oos,ois);
+      /*Packet _p = new Packet("email", "pwd");
       oos.writeObject(_p);
-      
-      while(true) {
-        System.out.println(((Packet)ois.readObject()).action);
-      }
-      
+
+      while (true)
+      {
+        try
+        {
+          System.out.println(((Packet) ois.readObject()).getAction());
+        }
+        catch (ClassNotFoundException e)
+        {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }*/
+
     }
-    catch (IOException | ClassNotFoundException e)
+    catch (IOException e) //| ClassNotFoundException e)
     {
       System.out.println("Error connecting to server");
       e.printStackTrace();
-    }    
+    }
   }
 
-  public void Login() throws IOException {
-    System.out.println("trying to login");     
+  public void Login(ObjectOutputStream _oos, ObjectInputStream _ois ) throws IOException
+  {
+    System.out.println("trying to login");
+    Packet _p = new Packet("email", "pwd");
+    _oos.writeObject(_p);
+    
+    while (true)
+    {
+      try
+      {
+        System.out.println(((Packet) _ois.readObject()).getAction());
+      }
+      catch (ClassNotFoundException e)
+      {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
     /*os.writeUTF("login,rr@gmail.com,rr");
     ObjectInputStream _ois = new ObjectInputStream(is);
     switch (is.readUTF()) {
@@ -84,17 +111,18 @@ public class Client
         System.out.println("Login Fallito");
     }*/
   }
-  
-  public void Add() {
+
+  public void Add()
+  {
     try
     {
       os.writeUTF("add");
-      System.out.println(is.readUTF());      
+      System.out.println(is.readUTF());
     }
     catch (IOException e)
     {
       System.out.print("Could not send add comand");
     }
   }
-  
+
 }
