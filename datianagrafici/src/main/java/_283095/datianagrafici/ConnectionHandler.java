@@ -42,7 +42,11 @@ public class ConnectionHandler extends Thread
         Packet _p = (Packet)ois.readObject();
         if(_p != null) {
           System.out.println(_p.getAction());
-          oos.writeObject(new Packet("response", new Impiegato()));
+          
+          switch(_p.getAction()) {
+            case "Login":
+              oos.writeObject(new Packet("response", LoginResponse(_p.getEmail(), _p.getPwd())));
+          }     
         }
       }
     }
@@ -54,7 +58,7 @@ public class ConnectionHandler extends Thread
     
   }
 
-  public Impiegato Login(String _email, String _pwd)
+  public Impiegato LoginResponse(String _email, String _pwd)
   {
     try
     {
@@ -66,7 +70,7 @@ public class ConnectionHandler extends Thread
 
         String[] data = row.split(",");
 
-        if (data[7].equals(_email) && data[8].equals(_pwd))
+        if (data[7].equals(_email) && data[8].equals(_pwd) && data[7] != null && data[8] != null)
         {
           System.out.println("Login Effettuato correttamente");
           csvReader.close();
