@@ -74,7 +74,7 @@ public class Client
   public void Login(ObjectOutputStream _oos, ObjectInputStream _ois ) throws IOException
   {
     System.out.println("trying to login");
-    Packet _p = new Packet("login,rr@gmail.com","rr");
+    Packet _p = new Packet("rr@gmail.com","rr");
     _oos.writeObject(_p);
     
     while (true)

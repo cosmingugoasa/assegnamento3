@@ -40,9 +40,7 @@ public class ConnectionHandler extends Thread
       outputStream.writeUTF("Hi, i'm server");
       while(true) {
         Packet _p = (Packet)ois.readObject();
-        if(_p != null) {
-          System.out.println(_p.getAction());
-          
+        if(_p != null) {          
           switch(_p.getAction()) {
             case "Login":
               oos.writeObject(new Packet("response", LoginResponse(_p.getEmail(), _p.getPwd())));
@@ -60,6 +58,7 @@ public class ConnectionHandler extends Thread
 
   public Impiegato LoginResponse(String _email, String _pwd)
   {
+    System.out.println("trying to login with : " + _email + _pwd);
     try
     {
       BufferedReader csvReader = new BufferedReader(
@@ -70,17 +69,18 @@ public class ConnectionHandler extends Thread
 
         String[] data = row.split(",");
 
-        if (data[7].equals(_email) && data[8].equals(_pwd) && data[7] != null && data[8] != null)
+        if (data[7].equals(_email) && data[8].equals(_pwd))
         {
-          System.out.println("Login Effettuato correttamente");
-          csvReader.close();
-          return new Impiegato(data[0], data[1], data[2], data[3], data[4],
+          Impiegato _logged = new Impiegato(data[0], data[1], data[2], data[3], data[4],
               new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
               new SimpleDateFormat("dd/MM/yyyy").parse(data[6]));
+          
+          csvReader.close();
+          return _logged;
         }
       }
-
       csvReader.close();
+      return null; 
     }
     catch (IOException e)
     {
