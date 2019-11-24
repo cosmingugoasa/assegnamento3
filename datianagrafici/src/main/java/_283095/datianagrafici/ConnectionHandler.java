@@ -48,6 +48,10 @@ public class ConnectionHandler extends Thread
             case "Login":
               oos.writeObject(new Packet("response",
                   LoginResponse(_p.getEmail(), _p.getPwd())));
+              break;
+            case "Add":
+              oos.writeBoolean(AddUser(_p));
+              break;
           }
         }
       }
@@ -97,4 +101,119 @@ public class ConnectionHandler extends Thread
     return null;
   }
 
+  public Boolean AddUser(Packet _p)
+  {
+    Impiegato _user = _p.getImpiegato();
+    System.out.println("trying to add : " + _user.taxCode + " " + _user.job);
+    try
+    {
+      BufferedReader csvReader = new BufferedReader(
+          new FileReader("Impiegati.csv"));
+      String row;
+      while ((row = csvReader.readLine()) != null)
+      {
+
+        String[] data = row.split(",");
+
+        if (!_user.taxCode.equals(data[2]))
+        {
+          try
+          {
+            FileWriter fo = new FileWriter("Impiegati.csv", false);
+
+            fo.append(_user.name + "," + _user.surname + "," + _user.taxCode
+                + "," + _user.hqAddress + "," + _user.job + "," + _user.start
+                + "," + _user.end + "\n");
+            fo.close();
+
+            System.out.println("User added");
+            csvReader.close();
+            return true;
+
+          }
+          catch (IOException e)
+          {
+            System.out.println("Could not update quantity.");
+            return false;
+          }
+        }
+      }
+      csvReader.close();
+      return false;
+    }
+    catch (IOException e)
+    {
+      System.out.println("Error adding user");
+      return false;
+    }
+  }
+
+  public Boolean ModUser(Packet _p) throws IOException
+  {
+    List<Impiegato> _users = new ArrayList<Impiegato>();
+
+    try
+    {
+      BufferedReader csvReader = new BufferedReader(
+          new FileReader("Impiegati.csv"));
+      String _row;
+      while ((_row = csvReader.readLine()) != null)
+      {
+        String[] _data = _row.split(",");
+        Impiegato _user = new Impiegato(_data[0], _data[1], _data[2], _data[3],
+            _data[4], new SimpleDateFormat("dd/MM/yyyy").parse(_data[5]),
+            new SimpleDateFormat("dd/MM/yyyy").parse(_data[6]));
+        _users.add(_user);
+      }
+      csvReader.close();
+
+    }
+    catch (IOException | ParseException e)
+    {
+      System.out.println("Could not open users in modify.");
+      e.printStackTrace();
+      return false;
+    }
+    
+    FileWriter fo = new FileWriter("Impiegati.csv", false);
+    for (Impiegato _user : _users)
+    {  
+      if (!_user.taxCode.equals(_p.getTaxCode()))
+      {
+        try
+        {
+          for (Impiegato _i : _users)
+          {
+            fo.append(_i.name + "," + _i.surname + "," + _i.taxCode + ","
+                + _i.hqAddress + "," + _i.job + "," + _i.start + "," + _i.end
+                + "\n");
+          }
+        }
+        catch (IOException e)
+        {
+          e.printStackTrace();
+          fo.close();
+          return false;
+        }
+      }
+      else
+      {
+        try
+        {
+          fo.append(_p.getImpiegato().name + "," + _p.getImpiegato().surname
+              + "," + _p.getImpiegato().taxCode + ","
+              + _p.getImpiegato().hqAddress + "," + _p.getImpiegato().job + ","
+              + _p.getImpiegato().start + "," + _p.getImpiegato().end + "\n");
+        }
+        catch (IOException e)
+        {
+          e.printStackTrace();
+          fo.close();
+          return false;
+        }
+      }
+    }
+    fo.close();
+    return true;
+  }
 }

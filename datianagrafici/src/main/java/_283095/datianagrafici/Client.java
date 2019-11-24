@@ -61,10 +61,14 @@ public class Client
       {
         AddImpiegato(new Impiegato("Martina", "g", "fefef", "fe", "Operaio",
             new Date(), new Date()), oos, ois);
+        
+        //TODO AGGIUNGERE QUI STAMPA DELLA RISPOSTA DAL SERVER
 
         ModifyImpiegato("taxcode", fuser.ModifyImpiegato("name", "_surname",
             "taxCode", "_hqAddress", "_job", new Date(), new Date()), oos, ois);
 
+      //TODO AGGIUNGERE QUI STAMPA DELLA RISPOSTA DAL SERVER
+        
         employeesList = Search("Impiegato", oos, ois);
         // TODO: METODO CHE STAMPA OGNI ELEMENTO della lista
       }
@@ -167,7 +171,7 @@ public class Client
   {
     try
     {
-      System.out.println("\nTrying to add Impiegato");
+      System.out.println("\nTrying to modify Impiegato");
       Packet _p = new Packet("Modify", _taxCode, _impiegato);
       _oos.writeObject(_p);
 

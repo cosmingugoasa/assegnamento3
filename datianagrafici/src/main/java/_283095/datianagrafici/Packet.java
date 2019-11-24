@@ -91,5 +91,9 @@ class Packet implements Serializable
   {
     return this.amministratore;
   }
+  
+  public String getTaxCode() {
+    return this.taxCode;
+  }
 
 }
