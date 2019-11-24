@@ -16,6 +16,9 @@ public class Client
   Dirigente duser = null;
   Amministratore auser = null;
 
+  String email = "rr@gmail.com";
+  String pwd = "rr";
+
   Client() throws ClassNotFoundException
   {
     System.out.println("Client starting...");
@@ -45,11 +48,11 @@ public class Client
 
       os.writeUTF("Hey ! I'm client " + new Random().nextInt(10));
       System.out.println(is.readUTF());
-      
-      Login(oos,ois);
+
+      Login(oos, ois);
       /*Packet _p = new Packet("email", "pwd");
       oos.writeObject(_p);
-
+      
       while (true)
       {
         try
@@ -64,52 +67,65 @@ public class Client
       }*/
 
     }
-    catch (IOException e) //| ClassNotFoundException e)
+    catch (IOException e) // | ClassNotFoundException e)
     {
       System.out.println("Error connecting to server");
       e.printStackTrace();
     }
   }
 
-  public void Login(ObjectOutputStream _oos, ObjectInputStream _ois ) throws IOException
+  public void Login(ObjectOutputStream _oos, ObjectInputStream _ois)
+      throws IOException
   {
     System.out.println("trying to login");
-    Packet _p = new Packet("rr@gmail.com","rr");
+    Packet _p = new Packet("login,rr@gmail.com", "rr");
     _oos.writeObject(_p);
-    
-    while (true)
+
+    try
     {
-      try
+      Impiegato _impiegato = ((Packet) _ois.readObject()).getImpiegato();
+      switch (_impiegato.job)
       {
-        System.out.println(((Packet) _ois.readObject()).getAction());
-      }
-      catch (ClassNotFoundException e)
-      {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        case "Funzionario":
+          fuser = new Funzionario(_impiegato.name, _impiegato.surname,
+              _impiegato.taxCode, _impiegato.hqAddress, _impiegato.start,
+              _impiegato.end, email, pwd);
+          if (fuser != null)
+          {
+            System.out.println("\nLogin eseguito :");
+            fuser.printDetails();
+          }
+          break;
+        case "Dirigente":
+          duser = new Dirigente(_impiegato.name, _impiegato.surname,
+              _impiegato.taxCode, _impiegato.hqAddress, _impiegato.start,
+              _impiegato.end, email, pwd);
+          if (duser != null)
+          {
+            System.out.println("\nLogin eseguito :");
+            duser.printDetails();
+          }
+          break;
+        case "Amministratore":
+          auser = new Amministratore(_impiegato.name, _impiegato.surname,
+              _impiegato.taxCode, _impiegato.hqAddress, _impiegato.start,
+              _impiegato.end, email, pwd);
+          if (auser != null)
+          {
+            System.out.println("\nLogin eseguito :");
+            auser.printDetails();
+          }
+          break;
+        default:
+          System.out.println("Login Fallito");
       }
     }
-    /*os.writeUTF("login,rr@gmail.com,rr");
-    ObjectInputStream _ois = new ObjectInputStream(is);
-    switch (is.readUTF()) {
-      case "Funzionario":
-        fuser = (Funzionario)_ois.readObject();
-        if(fuser != null)
-          System.out.println("Login eseguito");
-        break;
-      case "Dirigente":
-        duser = (Dirigente)_ois.readObject();
-        if(duser != null)
-          System.out.println("Login eseguito");
-        break;
-      case "Admin":
-        auser = (Amministratore)_ois.readObject();
-        if(auser != null)
-          System.out.println("Login eseguito");
-        break;
-      default:
-        System.out.println("Login Fallito");
-    }*/
+    catch (ClassNotFoundException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
   }
 
   public void Add()
