@@ -30,69 +30,55 @@ public class ConnectionHandler extends Thread
     String[] data;
     String line;
     BufferedReader csvReader;
-
+    
+    System.out.println("client on " + socket + " has own thread");
+    
     try
     {
-      System.out.println("client " + socket + " has own thread");
-
-      csvReader = new BufferedReader(new FileReader("Impiegati.csv"));
-
-      while ((line = csvReader.readLine()) != null)
-      {
-        data = line.split(",");
-        switch (data[4])
-        {
-          case "Operaio":
-            employeesList.add(new Operaio(data[0], data[1], data[2], data[3],
-                new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
-                new SimpleDateFormat("dd/MM/yyyy").parse(data[6])));
-            break;
-          case "Funzionario":
-            employeesList.add(new Funzionario(data[0], data[1], data[2],
-                data[3], new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
-                new SimpleDateFormat("dd/MM/yyyy").parse(data[6]), data[7],
-                data[8]));
-            break;
-          case "Dirigente":
-            employeesList.add(new Dirigente(data[0], data[1], data[2], data[3],
-                new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
-                new SimpleDateFormat("dd/MM/yyyy").parse(data[6]), data[7],
-                data[8]));
-            break;
-          case "Amministratore":
-            employeesList.add(new Amministratore(data[0], data[1], data[2],
-                data[3], new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
-                new SimpleDateFormat("dd/MM/yyyy").parse(data[6]), data[7],
-                data[8]));
-            break;
-        }
-      }
-
-      csvReader = new BufferedReader(new FileReader("Sedi.csv"));
-
-      while ((line = csvReader.readLine()) != null)
-      {
-        data = line.split(",");
-        HqList.add(new Sede(data[0], data[1]));
-      }
-
-      for (Impiegato item : employeesList)
-      {
-        // item.printDetails();
-        outputStream.writeUTF(
-            "Tax code:" + item.taxCode + "\nJob:" + item.job + "\n\n");
-      }
-
+      
       System.out.println(inputStream.readUTF());
-
     }
     catch (IOException e)
     {
+      System.out.println("Could not read from stream");
       e.printStackTrace();
+    }
+    
+  }
+
+  public Impiegato Login(String _email, String _pwd)
+  {
+    try
+    {
+      BufferedReader csvReader = new BufferedReader(
+          new FileReader("Impiegati.csv"));
+      String row;
+      while ((row = csvReader.readLine()) != null)
+      {
+
+        String[] data = row.split(",");
+
+        if (data[7].equals(_email) && data[8].equals(_pwd))
+        {
+          System.out.println("Login Effettuato correttamente");
+          csvReader.close();
+          return new Impiegato(data[0], data[1], data[2], data[3], data[4],
+              new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
+              new SimpleDateFormat("dd/MM/yyyy").parse(data[6]));
+        }
+      }
+
+      csvReader.close();
+    }
+    catch (IOException e)
+    {
+      return null;
     }
     catch (ParseException e)
     {
-      e.printStackTrace();
+      System.out.println("Error parsin date from file on Login");
     }
+    return null;
   }
+
 }
