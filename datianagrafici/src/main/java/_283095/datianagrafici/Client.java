@@ -2,6 +2,8 @@ package _283095.datianagrafici;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 public class Client
@@ -18,6 +20,8 @@ public class Client
 
   String email = "rr@gmail.com";
   String pwd = "rr";
+
+  List<Impiegato> employeesList;
 
   Client() throws ClassNotFoundException
   {
@@ -50,21 +54,34 @@ public class Client
       System.out.println(is.readUTF());
 
       Login(oos, ois);
-      /*Packet _p = new Packet("email", "pwd");
-      oos.writeObject(_p);
-      
-      while (true)
+
+      // TODO: tra una azione ed un altra implementare un tempo di attesa
+
+      if (fuser != null)
       {
-        try
-        {
-          System.out.println(((Packet) ois.readObject()).getAction());
-        }
-        catch (ClassNotFoundException e)
-        {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-      }*/
+        AddImpiegato(new Impiegato("Martina", "g", "fefef", "fe", "Operaio",
+            new Date(), new Date()), oos, ois);
+
+        ModifyImpiegato("taxcode", fuser.ModifyImpiegato("name", "_surname",
+            "taxCode", "_hqAddress", "_job", new Date(), new Date()), oos, ois);
+
+        employeesList = Search("Impiegato", oos, ois);
+        // TODO: METODO CHE STAMPA OGNI ELEMENTO della lista
+      }
+      else if (duser != null)
+      {
+        employeesList = Search(duser.search("Operaio"), oos, ois);
+        employeesList = Search(duser.search("Funzionario"), oos, ois);
+        // TODO: METODO CHE STAMPA OGNI ELEMENTO
+      }
+      else if (auser != null)
+      {
+        employeesList = Search(duser.search("Operaio"), oos, ois);
+        employeesList = Search(duser.search("Funzionario"), oos, ois);
+        employeesList = Search(duser.search("Dirigente"), oos, ois);
+        employeesList = Search(duser.search("Amministratore"), oos, ois);
+        // TODO: METODO CHE STAMPA OGNI ELEMENTO
+      }
 
     }
     catch (IOException e) // | ClassNotFoundException e)
@@ -77,7 +94,7 @@ public class Client
   public void Login(ObjectOutputStream _oos, ObjectInputStream _ois)
       throws IOException
   {
-    System.out.println("trying to login");
+    System.out.println("\nTrying to login");
     Packet _p = new Packet(email, pwd);
     _oos.writeObject(_p);
 
@@ -117,7 +134,7 @@ public class Client
           }
           break;
         default:
-          System.out.println("Login Fallito");
+          System.out.println("\nLogin Fallito");
       }
     }
     catch (ClassNotFoundException e)
@@ -128,12 +145,16 @@ public class Client
 
   }
 
-  public void Add()
+  public void AddImpiegato(Impiegato _impiegato, ObjectOutputStream _oos,
+      ObjectInputStream _ois)
   {
     try
     {
-      os.writeUTF("add");
-      System.out.println(is.readUTF());
+      System.out.println("\nTrying to add Impiegato");
+      Packet _p = new Packet("Add", _impiegato);
+      _oos.writeObject(_p);
+
+      // TODO: comunicare l'esito dell'inserimento
     }
     catch (IOException e)
     {
@@ -141,4 +162,50 @@ public class Client
     }
   }
 
+  public void ModifyImpiegato(String _taxCode, Impiegato _impiegato,
+      ObjectOutputStream _oos, ObjectInputStream _ois)
+  {
+    try
+    {
+      System.out.println("\nTrying to add Impiegato");
+      Packet _p = new Packet("Modify", _taxCode, _impiegato);
+      _oos.writeObject(_p);
+
+      // TODO: comunicare l'esito dell'inserimento
+    }
+    catch (IOException e)
+    {
+      System.out.print("Could not send add comand");
+    }
+  }
+
+  public List<Impiegato> Search(String _job, ObjectOutputStream _oos,
+      ObjectInputStream _ois)
+  {
+    System.out.println("\nTrying to add Impiegato");
+    Packet _p = new Packet("Search", _job);
+    try
+    {
+      _oos.writeObject(_p);
+
+      // TODO: verificare che la lista non sia vuota e poi ritornarla Ritornare
+      // la lista
+    }
+    catch (IOException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    return null;
+  }
+
+  // fuzione che stampa ogni element della lista di impiegati
+  public void PrintList(List<Impiegato> _list)
+  {
+    for (Impiegato item : _list)
+    {
+      item.printDetails();
+    }
+  }
 }

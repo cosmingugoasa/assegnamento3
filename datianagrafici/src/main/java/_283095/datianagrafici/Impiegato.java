@@ -13,7 +13,7 @@ public class Impiegato implements Serializable
   String job;
   Date start;
   Date end;
-  
+
   Impiegato()
   {
     name = "";
@@ -39,6 +39,9 @@ public class Impiegato implements Serializable
 
   public void printDetails()
   {
-    System.out.println("Tax code:"+taxCode+"\nJob:"+job);
+    System.out
+        .println("\n Name:" + name + "\nSurname:" + surname + "\nTax code: "
+            + taxCode + "\nJob: " + job + "\nhqAddres: " + hqAddress + "\njob: "
+            + job + "\nStart Date : " + start + "\nEnd Date:" + end);
   }
 }

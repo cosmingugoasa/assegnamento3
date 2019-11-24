@@ -12,36 +12,49 @@ class Packet implements Serializable
   private Amministratore amministratore;
   private String email;
   private String pwd;
+  private String taxCode;
 
+  // costruttore per aggiungere impiegato
   public Packet(String _action, Impiegato _Impiegato)
   {
     action = _action;
     impiegato = _Impiegato;
   }
 
+  // costruttore per aggiungere funzionario
   public Packet(String _action, Funzionario _Funzionario)
   {
     action = _action;
     funzionario = _Funzionario;
   }
 
+  // costruttore per aggiungere dirigente
   public Packet(String _action, Dirigente _Dirigente)
   {
     action = _action;
     dirigente = _Dirigente;
   }
 
+  // costruttore per aggiungere amministratore
   public Packet(String _action, Amministratore _Amministratore)
   {
     action = _action;
     amministratore = _Amministratore;
   }
 
+  // costruttore per Login
   public Packet(String _email, String _pwd)
   {
     action = "Login";
     email = _email;
     pwd = _pwd;
+  }
+
+  public Packet(String _action, String _taxCode, Impiegato _impiegato)
+  {
+    action = _action;
+    taxCode = _taxCode;
+    impiegato = _impiegato;
   }
 
   public String getAction()

@@ -30,21 +30,25 @@ public class ConnectionHandler extends Thread
     String[] data;
     String line;
     BufferedReader csvReader;
-    
+
     try
     {
       ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
       ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-      
+
       System.out.println(inputStream.readUTF());
       outputStream.writeUTF("Hi, i'm server");
-      while(true) {
-        Packet _p = (Packet)ois.readObject();
-        if(_p != null) {          
-          switch(_p.getAction()) {
+      while (true)
+      {
+        Packet _p = (Packet) ois.readObject();
+        if (_p != null)
+        {
+          switch (_p.getAction())
+          {
             case "Login":
-              oos.writeObject(new Packet("response", LoginResponse(_p.getEmail(), _p.getPwd())));
-          }     
+              oos.writeObject(new Packet("response",
+                  LoginResponse(_p.getEmail(), _p.getPwd())));
+          }
         }
       }
     }
@@ -53,7 +57,7 @@ public class ConnectionHandler extends Thread
       System.out.println("Could not read from stream");
       e.printStackTrace();
     }
-    
+
   }
 
   public Impiegato LoginResponse(String _email, String _pwd)
@@ -71,16 +75,16 @@ public class ConnectionHandler extends Thread
 
         if (data[7].equals(_email) && data[8].equals(_pwd))
         {
-          Impiegato _logged = new Impiegato(data[0], data[1], data[2], data[3], data[4],
-              new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
+          Impiegato _logged = new Impiegato(data[0], data[1], data[2], data[3],
+              data[4], new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
               new SimpleDateFormat("dd/MM/yyyy").parse(data[6]));
-          
+
           csvReader.close();
           return _logged;
         }
       }
       csvReader.close();
-      return null; 
+      return null;
     }
     catch (IOException e)
     {
