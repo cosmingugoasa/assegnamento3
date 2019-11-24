@@ -78,7 +78,7 @@ public class Client
       throws IOException
   {
     System.out.println("trying to login");
-    Packet _p = new Packet("login,rr@gmail.com", "rr");
+    Packet _p = new Packet(email, pwd);
     _oos.writeObject(_p);
 
     try
