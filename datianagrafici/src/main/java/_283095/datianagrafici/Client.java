@@ -2,9 +2,6 @@ package _283095.datianagrafici;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class Client
@@ -42,49 +39,29 @@ public class Client
       server = new Socket(server_host, server_port);
       is = new DataInputStream(server.getInputStream());
       os = new DataOutputStream(server.getOutputStream());
+      ObjectOutputStream oos = new ObjectOutputStream(server.getOutputStream());
+      ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
       
-      System.out.println("received : " + is.readUTF());
-
-      System.out.println(is.readUTF());
       os.writeUTF("Hey ! I'm client " + new Random().nextInt(10));
-      
-    }
-    catch (IOException e)
-    {
-      System.out.println("Error connecting to server");
-      e.printStackTrace();
-    }
-    
-    
-    /*try
-    {
-      server = new Socket(server_host, server_port);
-      is = new ObjectInputStream(server.getInputStream());
-      os = new ObjectOutputStream(server.getOutputStream());
-
-      os.writeObject("client reaching...\n");
-
-      System.out.println("received : " + is.readObject());
-
       System.out.println(is.readUTF());
-      os.writeObject("Hey ! I'm client " + new Random().nextInt(10));
-
-      while (true)
-      {
-        System.out.println("client working...");
-        System.in.read();
+      
+      Packet _p = new Packet("requst", 1);
+      oos.writeObject(_p);
+      
+      while(true) {
+        System.out.println(((Packet)ois.readObject()).action);
       }
       
     }
-    catch (IOException e)
+    catch (IOException | ClassNotFoundException e)
     {
-      System.out.println("Server non raggiungibile.");
-    }*/
+      System.out.println("Error connecting to server");
+      e.printStackTrace();
+    }    
   }
 
   public void Login() throws IOException {
-    System.out.println("trying to login");    
-    
+    System.out.println("trying to login");     
     /*os.writeUTF("login,rr@gmail.com,rr");
     ObjectInputStream _ois = new ObjectInputStream(is);
     switch (is.readUTF()) {
@@ -112,9 +89,7 @@ public class Client
     try
     {
       os.writeUTF("add");
-      System.out.println(is.readUTF());
-      
-      
+      System.out.println(is.readUTF());      
     }
     catch (IOException e)
     {

@@ -31,14 +31,22 @@ public class ConnectionHandler extends Thread
     String line;
     BufferedReader csvReader;
     
-    System.out.println("client on " + socket + " has own thread");
-    
     try
     {
+      ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+      ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
       
       System.out.println(inputStream.readUTF());
+      outputStream.writeUTF("Hi, i'm server");
+      
+      Packet _p = (Packet)ois.readObject();
+      if(_p != null) {
+        System.out.println(_p.action);
+        oos.writeObject(new Packet("response", 2));
+      }
+      
     }
-    catch (IOException e)
+    catch (IOException | ClassNotFoundException e)
     {
       System.out.println("Could not read from stream");
       e.printStackTrace();
