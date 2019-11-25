@@ -222,7 +222,8 @@ public class ConnectionHandler extends Thread
                   .format(_p.getImpiegato().start)
               + ","
               + new SimpleDateFormat("dd/MM/yyyy").format(_p.getImpiegato().end)
-              + "," + _p.getImpiegato().email + "," + _p.getImpiegato().pwd + "\n");
+              + "," + _p.getImpiegato().email + "," + _p.getImpiegato().pwd
+              + "\n");
         }
         catch (IOException e)
         {
@@ -248,7 +249,7 @@ public class ConnectionHandler extends Thread
       while ((_row = csvReader.readLine()) != null)
       {
         String[] _data = _row.split(",");
-        if (_data[4].equals(_p.getPwd()))
+        if (_data[4].equals(_p.getJob()))
         {
           Impiegato _user = new Impiegato(_data[0], _data[1], _data[2],
               _data[3], _data[4],
@@ -259,6 +260,7 @@ public class ConnectionHandler extends Thread
         }
       }
       csvReader.close();
+
       return _searched;
     }
     catch (IOException | ParseException e)

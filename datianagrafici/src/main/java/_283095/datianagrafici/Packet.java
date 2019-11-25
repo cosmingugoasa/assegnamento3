@@ -14,7 +14,7 @@ class Packet implements Serializable
   private String email;
   private String pwd;
   private String taxCode;
-  // private String job;
+  private String job;
   private List<Impiegato> searched;
 
   // costruttore per aggiungere impiegato
@@ -46,13 +46,14 @@ class Packet implements Serializable
   }
 
   // costruttore per Login
-  public Packet(String _email, String _pwd)
+  public Packet(String _action, String _email, String _pwd)
   {
-    action = "Login";
+    action = _action;
     email = _email;
     pwd = _pwd;
   }
 
+  // costruttore per modifica
   public Packet(String _action, String _taxCode, Impiegato _impiegato)
   {
     action = _action;
@@ -60,10 +61,18 @@ class Packet implements Serializable
     impiegato = _impiegato;
   }
 
+  // costruttore per ritorno ricerca
   public Packet(String _action, List<Impiegato> _searched)
   {
     action = _action;
     searched = _searched;
+  }
+
+  // Costruttore per ricerca
+  public Packet(String _action, String _Job)
+  {
+    action = _action;
+    job = _Job;
   }
 
   public String getAction()
@@ -79,6 +88,11 @@ class Packet implements Serializable
   public String getPwd()
   {
     return this.pwd;
+  }
+
+  public String getJob()
+  {
+    return this.job;
   }
 
   public Impiegato getImpiegato()

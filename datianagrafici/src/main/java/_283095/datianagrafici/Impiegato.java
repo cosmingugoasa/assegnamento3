@@ -46,7 +46,7 @@ public class Impiegato implements Serializable
   public void printDetails()
   {
     System.out
-        .println("\n Name:" + name + "\nSurname:" + surname + "\nTax code: "
+        .println("\nName:" + name + "\nSurname:" + surname + "\nTax code: "
             + taxCode + "\nJob: " + job + "\nhqAddres: " + hqAddress + "\njob: "
             + job + "\nStart Date : " + start + "\nEnd Date:" + end);
   }

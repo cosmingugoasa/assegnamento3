@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -61,21 +62,18 @@ public class Client
 
       if (fuser != null)
       {
-        AddImpiegato(new Impiegato("Martina", "g", "prova2", "fe", "Operaio",
+        AddImpiegato(new Impiegato("Mario", "g", "prova3", "fe", "Dirigente",
             new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
             new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
-            "marty@gmail.com", "rr"), oos, ois);
+            "mario@gmail.com", "rr"), oos, ois);
 
-        ModifyImpiegato("prova",
+        /*ModifyImpiegato("prova",
             fuser.ModifyImpiegato("name", "_surname", "taxCode2", "_hqAddress",
                 "Operaio", new Date(), new Date(), "email@gmail.com", "pass"),
-            oos, ois);
+            oos, ois);*/
 
-        // TODO AGGIUNGERE QUI STAMPA DELLA RISPOSTA DAL SERVER
+        employeesList = Search("Operaio", oos, ois);
 
-        /* employeesList = Search("Impiegato", oos, ois);
-        // TODO: METODO CHE STAMPA OGNI ELEMENTO della lista
-        // TODO: AGGIUNGERE QUI CICLO DI STAMPA CON RISPOSTA DAL SERVER*/
       }
       else if (duser != null)
       {
@@ -104,7 +102,7 @@ public class Client
       throws IOException
   {
     System.out.println("\nTrying to login");
-    Packet _p = new Packet(email, pwd);
+    Packet _p = new Packet("Login", email, pwd);
     _oos.writeObject(_p);
 
     try
@@ -203,11 +201,12 @@ public class Client
     {
       _oos.writeObject(_p);
 
-      employeesList = ((Packet) _ois.readObject()).getSearched();
-      if (employeesList != null)
+      employeesList = new ArrayList<Impiegato>(
+          ((Packet) _ois.readObject()).getSearched());
+      if (!employeesList.isEmpty())
       {
-        System.out.println("\nUtenti " + _job + "trovati: ");
-        PrintList(((Packet) _ois.readObject()).getSearched());
+        System.out.println("\nUtenti " + _job + " trovati: ");
+        PrintList(employeesList);
       }
       else
         System.out.println("Nessun Utente trovato come " + _job);
