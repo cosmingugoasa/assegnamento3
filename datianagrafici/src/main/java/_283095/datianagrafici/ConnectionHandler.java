@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ConnectionHandler extends Thread
 {
@@ -42,8 +43,10 @@ public class ConnectionHandler extends Thread
         Packet _p = (Packet) ois.readObject();
         if (_p != null)
         {
+          Thread.sleep(new Random().nextInt((4000 - 1500) + 1) + 1500);
+          
           switch (_p.getAction())
-          {
+          { 
             case "Login":
               oos.writeObject(new Packet("response",
                   LoginResponse(_p.getEmail(), _p.getPwd())));
@@ -64,7 +67,7 @@ public class ConnectionHandler extends Thread
         }
       }
     }
-    catch (IOException | ClassNotFoundException e)
+    catch (IOException | ClassNotFoundException | InterruptedException e)
     {
       System.out.println("Could not read from stream or invalid class");
       e.printStackTrace();
