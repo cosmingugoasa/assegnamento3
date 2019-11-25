@@ -52,10 +52,10 @@ public class ConnectionHandler extends Thread
                   LoginResponse(_p.getEmail(), _p.getPwd())));
               break;
             case "Add":
-              oos.writeBoolean(AddUser(_p));
+              oos.writeObject(new Packet("response", AddUser(_p)));
               break;
             case "Modify":
-              oos.writeBoolean(ModUser(_p));
+              oos.writeObject(new Packet("response", ModUser(_p)));
               break;
             case "Search":
               oos.writeObject(new Packet("response", Search(_p)));
@@ -117,58 +117,62 @@ public class ConnectionHandler extends Thread
     System.out.println("trying to add : " + _user.taxCode + " " + _user.job);
     try
     {
-      BufferedReader csvReader = new BufferedReader(
-          new FileReader("Impiegati.csv"));
-      String row;
-      while ((row = csvReader.readLine()) != null)
+      if (!CheckTaxCode(_user.taxCode)) // Controllo che il taxCode non sia già
+                                        // presente
       {
-
-        String[] data = row.split(",");
-
-        if (!_user.taxCode.equals(data[2]))
+        BufferedReader csvReader = new BufferedReader(
+            new FileReader("Impiegati.csv"));
+        String row;
+        while ((row = csvReader.readLine()) != null)
         {
-          try
+          String[] data = row.split(",");
+
+          if (!_user.taxCode.equals(data[2]))
           {
-            FileWriter fo = new FileWriter("Impiegati.csv", true);
+            try
+            {
+              FileWriter fo = new FileWriter("Impiegati.csv", true);
 
-            fo.append(_user.name + "," + _user.surname + "," + _user.taxCode
-                + "," + _user.hqAddress + "," + _user.job + ","
-                + new SimpleDateFormat("dd/MM/yyyy").format(_user.start) + ","
-                + new SimpleDateFormat("dd/MM/yyyy").format(_user.end) + ","
-                + _user.email + "," + _user.pwd + "\n");
-            fo.close();
+              fo.append(_user.name + "," + _user.surname + "," + _user.taxCode
+                  + "," + _user.hqAddress + "," + _user.job + ","
+                  + new SimpleDateFormat("dd/MM/yyyy").format(_user.start) + ","
+                  + new SimpleDateFormat("dd/MM/yyyy").format(_user.end) + ","
+                  + _user.email + "," + _user.pwd + "\n");
+              fo.close();
 
-            System.out.println("User added");
-            csvReader.close();
-            return true;
-
-          }
-          catch (IOException e)
-          {
-            System.out.println("Could not update quantity.");
-            return false;
+              System.out.println("User added");
+              csvReader.close();
+              return true;
+            }
+            catch (IOException e)
+            {
+              System.out.println("Could not update quantity.");
+              return false;
+            }
           }
         }
+        csvReader.close();
+        return false;
       }
-      csvReader.close();
-      return false;
     }
     catch (IOException e)
     {
       System.out.println("Error adding user");
       return false;
     }
+    return false;
   }
 
-  public Boolean ModUser(Packet _p) throws IOException
+  public List<Impiegato> GetList()
   {
     List<Impiegato> _users = new ArrayList<Impiegato>();
 
+    String _row;
     try
     {
       BufferedReader csvReader = new BufferedReader(
           new FileReader("Impiegati.csv"));
-      String _row;
+
       while ((_row = csvReader.readLine()) != null)
       {
         String[] _data = _row.split(",");
@@ -183,58 +187,88 @@ public class ConnectionHandler extends Thread
     }
     catch (IOException | ParseException e)
     {
-      System.out.println("Could not open users in modify.");
+      // TODO Auto-generated catch block
       e.printStackTrace();
-      return false;
     }
 
-    FileWriter fo = new FileWriter("Impiegati.csv");
-    for (Impiegato _user : _users)
+    return _users;
+  }
+
+  public Boolean CheckTaxCode(String _taxCode)
+  {
+    List<Impiegato> employees = new ArrayList<Impiegato>(GetList());
+
+    for (Impiegato item : employees)
     {
-      if (!_user.taxCode.equals(_p.getTaxCode()))
+      if (item.taxCode.equals(_taxCode))
       {
-        try
-        {
-
-          fo.append(_user.name + "," + _user.surname + "," + _user.taxCode + ","
-              + _user.hqAddress + "," + _user.job + ","
-              + new SimpleDateFormat("dd/MM/yyyy").format(_user.start) + ","
-              + new SimpleDateFormat("dd/MM/yyyy").format(_user.end) + ","
-              + _user.email + "," + _user.pwd + "\n");
-
-        }
-        catch (IOException e)
-        {
-          e.printStackTrace();
-          fo.close();
-          return false;
-        }
-      }
-      else
-      {
-        try
-        {
-          // TODO Solo dove non non sono nulli cambio
-          fo.append(_p.getImpiegato().name + "," + _p.getImpiegato().surname
-              + "," + _p.getImpiegato().taxCode + ","
-              + _p.getImpiegato().hqAddress + "," + _p.getImpiegato().job + ","
-              + new SimpleDateFormat("dd/MM/yyyy")
-                  .format(_p.getImpiegato().start)
-              + ","
-              + new SimpleDateFormat("dd/MM/yyyy").format(_p.getImpiegato().end)
-              + "," + _p.getImpiegato().email + "," + _p.getImpiegato().pwd
-              + "\n");
-        }
-        catch (IOException e)
-        {
-          e.printStackTrace();
-          fo.close();
-          return false;
-        }
+        System.out.println("Codice Fiscale gia' esistente");
+        return true;
       }
     }
-    fo.close();
-    return true;
+    return false;
+  }
+
+  public Boolean ModUser(Packet _p) throws IOException
+  {
+
+    List<Impiegato> _users = new ArrayList<Impiegato>(GetList());
+
+    if (!CheckTaxCode(_p.getImpiegato().taxCode)) // Controllo che il taxCode non sia già
+                                        // presente
+    {
+
+      FileWriter fo = new FileWriter("Impiegati.csv");
+      for (Impiegato _user : _users)
+      {
+        if (!_user.taxCode.equals(_p.getTaxCode()))
+        {
+          try
+          {
+
+            fo.append(_user.name + "," + _user.surname + "," + _user.taxCode
+                + "," + _user.hqAddress + "," + _user.job + ","
+                + new SimpleDateFormat("dd/MM/yyyy").format(_user.start) + ","
+                + new SimpleDateFormat("dd/MM/yyyy").format(_user.end) + ","
+                + _user.email + "," + _user.pwd + "\n");
+
+          }
+          catch (IOException e)
+          {
+            e.printStackTrace();
+            fo.close();
+            return false;
+          }
+        }
+        else
+        {
+          try
+          {
+            // TODO Solo dove non non sono nulli cambio
+            fo.append(_p.getImpiegato().name + "," + _p.getImpiegato().surname
+                + "," + _p.getImpiegato().taxCode + ","
+                + _p.getImpiegato().hqAddress + "," + _p.getImpiegato().job
+                + ","
+                + new SimpleDateFormat("dd/MM/yyyy")
+                    .format(_p.getImpiegato().start)
+                + ","
+                + new SimpleDateFormat("dd/MM/yyyy")
+                    .format(_p.getImpiegato().end)
+                + "," + _p.getImpiegato().email + "," + _p.getImpiegato().pwd
+                + "\n");
+          }
+          catch (IOException e)
+          {
+            e.printStackTrace();
+            fo.close();
+            return false;
+          }
+        }
+      }
+      fo.close();
+      return true;
+    }
+    return false;
   }
 
   public List<Impiegato> Search(Packet _p)

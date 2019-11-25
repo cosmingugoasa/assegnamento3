@@ -16,6 +16,7 @@ class Packet implements Serializable
   private String taxCode;
   private String job;
   private List<Impiegato> searched;
+  Boolean value;
 
   // costruttore per aggiungere impiegato
   public Packet(String _action, Impiegato _Impiegato)
@@ -74,7 +75,13 @@ class Packet implements Serializable
     action = _action;
     job = _Job;
   }
-
+  
+  public Packet(String _action, Boolean _value)
+  {
+    action = _action;
+    value = _value;
+  }
+  
   public String getAction()
   {
     return this.action;

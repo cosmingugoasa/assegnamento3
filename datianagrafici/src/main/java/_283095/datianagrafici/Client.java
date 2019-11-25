@@ -67,10 +67,10 @@ public class Client
             new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
             "mario@gmail.com", "rr"), oos, ois);
 
-        /*ModifyImpiegato("prova",
+        ModifyImpiegato("prova",
             fuser.ModifyImpiegato("name", "_surname", "taxCode2", "_hqAddress",
                 "Operaio", new Date(), new Date(), "email@gmail.com", "pass"),
-            oos, ois);*/
+            oos, ois);
 
         employeesList = Search("Operaio", oos, ois);
 
@@ -155,41 +155,51 @@ public class Client
   public void AddImpiegato(Impiegato _impiegato, ObjectOutputStream _oos,
       ObjectInputStream _ois)
   {
-    try
+    if (_impiegato.taxCode.length() == 16)
     {
-      System.out.println("\nTrying to add Impiegato");
-      Packet _p = new Packet("Add", _impiegato);
-      _oos.writeObject(_p);
+      try
+      {
+        System.out.println("\nTrying to add Impiegato");
+        Packet _p = new Packet("Add", _impiegato);
+        _oos.writeObject(_p);
 
-      if (_ois.readBoolean())
-        System.out.println("\nUtente Inserito Correttamente!!!");
-      else
-        System.out.println("\nErrore inserimento utente!!!");
+        if (((Packet) _ois.readObject()).value)
+          System.out.println("\nUtente Inserito Correttamente!!!");
+        else
+          System.out.println("\nErrore inserimento utente!!!");
+      }
+      catch (IOException | ClassNotFoundException e)
+      {
+        System.out.print(e);
+      }
     }
-    catch (IOException e)
-    {
-      System.out.print("Could not send add comand");
-    }
+    else
+      System.out.println("\nErrore inserimento Codice Fiscale!!!");
   }
 
   public void ModifyImpiegato(String _taxCode, Impiegato _impiegato,
       ObjectOutputStream _oos, ObjectInputStream _ois)
   {
-    try
+    if (_impiegato.taxCode.length() == 16)
     {
-      System.out.println("\nTrying to modify Impiegato");
-      Packet _p = new Packet("Modify", _taxCode, _impiegato);
-      _oos.writeObject(_p);
+      try
+      {
+        System.out.println("\nTrying to modify Impiegato");
+        Packet _p = new Packet("Modify", _taxCode, _impiegato);
+        _oos.writeObject(_p);
 
-      if (_ois.readBoolean())
-        System.out.println("\nUtente Modificato Correttamente!!!");
-      else
-        System.out.println("\nErrore Modifca utente!!!");
+        if (((Packet) _ois.readObject()).value)
+          System.out.println("\nUtente Modificato Correttamente!!!");
+        else
+          System.out.println("\nErrore Modifca utente!!!");
+      }
+      catch (IOException | ClassNotFoundException e)
+      {
+        System.out.print("Could not send add comand");
+      }
     }
-    catch (IOException e)
-    {
-      System.out.print("Could not send add comand");
-    }
+    else
+      System.out.print("Errore inserimento Codice Fiscale");
   }
 
   public List<Impiegato> Search(String _job, ObjectOutputStream _oos,
@@ -220,7 +230,7 @@ public class Client
     return null;
   }
 
-  // fuzione che stampa ogni element della lista di impiegati
+  // fuzione che stampa ogni elemento della lista di impiegati
   public void PrintList(List<Impiegato> _list)
   {
     for (Impiegato item : _list)
