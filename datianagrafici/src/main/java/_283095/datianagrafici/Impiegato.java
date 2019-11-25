@@ -13,6 +13,8 @@ public class Impiegato implements Serializable
   String job;
   Date start;
   Date end;
+  String email;
+  String pwd;
 
   Impiegato()
   {
@@ -23,10 +25,12 @@ public class Impiegato implements Serializable
     job = "";
     start = null;
     end = null;
+    email = "";
+    pwd = "";
   }
 
   Impiegato(String _name, String _surname, String _taxCode, String _hqAddress,
-      String _job, Date _start, Date _end)
+      String _job, Date _start, Date _end, String _email, String _pwd)
   {
     name = _name;
     surname = _surname;
@@ -35,6 +39,8 @@ public class Impiegato implements Serializable
     job = _job;
     start = _start;
     end = _end;
+    email = _email;
+    pwd = _pwd;
   }
 
   public void printDetails()

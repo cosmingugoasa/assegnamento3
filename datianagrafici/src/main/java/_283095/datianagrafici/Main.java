@@ -37,7 +37,8 @@ public class Main
           case "Operaio":
             employeesList.add(new Operaio(data[0], data[1], data[2], data[3],
                 new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
-                new SimpleDateFormat("dd/MM/yyyy").parse(data[6])));
+                new SimpleDateFormat("dd/MM/yyyy").parse(data[6]),data[7],
+                data[8]));
             break;
           case "Funzionario":
             employeesList.add(new Funzionario(data[0], data[1], data[2],

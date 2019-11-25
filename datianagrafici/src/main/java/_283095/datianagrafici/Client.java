@@ -2,6 +2,8 @@ package _283095.datianagrafici;
 
 import java.io.*;
 import java.net.Socket;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -59,19 +61,21 @@ public class Client
 
       if (fuser != null)
       {
-        AddImpiegato(new Impiegato("Martina", "g", "fefef", "fe", "Operaio",
-            new Date(), new Date()), oos, ois);
-        
-        //TODO AGGIUNGERE QUI STAMPA DELLA RISPOSTA DAL SERVER
+        AddImpiegato(new Impiegato("Martina", "g", "prova2", "fe", "Operaio",
+            new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
+            new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
+            "marty@gmail.com", "rr"), oos, ois);
 
-        ModifyImpiegato("taxcode", fuser.ModifyImpiegato("name", "_surname",
-            "taxCode", "_hqAddress", "_job", new Date(), new Date()), oos, ois);
+        ModifyImpiegato("prova",
+            fuser.ModifyImpiegato("name", "_surname", "taxCode2", "_hqAddress",
+                "Operaio", new Date(), new Date(), "email@gmail.com", "pass"),
+            oos, ois);
 
-      //TODO AGGIUNGERE QUI STAMPA DELLA RISPOSTA DAL SERVER
-        
-        employeesList = Search("Impiegato", oos, ois);
+        // TODO AGGIUNGERE QUI STAMPA DELLA RISPOSTA DAL SERVER
+
+        /* employeesList = Search("Impiegato", oos, ois);
         // TODO: METODO CHE STAMPA OGNI ELEMENTO della lista
-        //TODO: AGGIUNGERE QUI CICLO DI STAMPA CON RISPOSTA DAL SERVER
+        // TODO: AGGIUNGERE QUI CICLO DI STAMPA CON RISPOSTA DAL SERVER*/
       }
       else if (duser != null)
       {
@@ -81,19 +85,19 @@ public class Client
       }
       else if (auser != null)
       {
-        employeesList = Search(duser.search("Operaio"), oos, ois);
-        employeesList = Search(duser.search("Funzionario"), oos, ois);
-        employeesList = Search(duser.search("Dirigente"), oos, ois);
-        employeesList = Search(duser.search("Amministratore"), oos, ois);
-        // TODO: METODO CHE STAMPA OGNI ELEMENTO
+        employeesList = Search(auser.search("Operaio"), oos, ois);
+        employeesList = Search(auser.search("Funzionario"), oos, ois);
+        employeesList = Search(auser.search("Dirigente"), oos, ois);
+        employeesList = Search(auser.search("Amministratore"), oos, ois);
       }
 
     }
-    catch (IOException e) // | ClassNotFoundException e)
+    catch (IOException | ParseException e) // | ClassNotFoundException e)
     {
       System.out.println("Error connecting to server");
       e.printStackTrace();
     }
+
   }
 
   public void Login(ObjectOutputStream _oos, ObjectInputStream _ois)
@@ -159,7 +163,10 @@ public class Client
       Packet _p = new Packet("Add", _impiegato);
       _oos.writeObject(_p);
 
-      // TODO: comunicare l'esito dell'inserimento
+      if (_ois.readBoolean())
+        System.out.println("\nUtente Inserito Correttamente!!!");
+      else
+        System.out.println("\nErrore inserimento utente!!!");
     }
     catch (IOException e)
     {
@@ -176,7 +183,10 @@ public class Client
       Packet _p = new Packet("Modify", _taxCode, _impiegato);
       _oos.writeObject(_p);
 
-      // TODO: comunicare l'esito dell'inserimento
+      if (_ois.readBoolean())
+        System.out.println("\nUtente Modificato Correttamente!!!");
+      else
+        System.out.println("\nErrore Modifca utente!!!");
     }
     catch (IOException e)
     {
@@ -187,16 +197,22 @@ public class Client
   public List<Impiegato> Search(String _job, ObjectOutputStream _oos,
       ObjectInputStream _ois)
   {
-    System.out.println("\nTrying to add Impiegato");
+    System.out.println("\nTrying to Search by " + _job);
     Packet _p = new Packet("Search", _job);
     try
     {
       _oos.writeObject(_p);
 
-      //TODO: verificare che la lista non sia NULL e poi stamparla
-      //TODO: inserire qui ciclo di stampa della risposta del server
+      employeesList = ((Packet) _ois.readObject()).getSearched();
+      if (employeesList != null)
+      {
+        System.out.println("\nUtenti " + _job + "trovati: ");
+        PrintList(((Packet) _ois.readObject()).getSearched());
+      }
+      else
+        System.out.println("Nessun Utente trovato come " + _job);
     }
-    catch (IOException e)
+    catch (IOException | ClassNotFoundException e)
     {
       // TODO Auto-generated catch block
       e.printStackTrace();

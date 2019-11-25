@@ -14,7 +14,7 @@ class Packet implements Serializable
   private String email;
   private String pwd;
   private String taxCode;
-  //private String job;
+  // private String job;
   private List<Impiegato> searched;
 
   // costruttore per aggiungere impiegato
@@ -59,8 +59,9 @@ class Packet implements Serializable
     taxCode = _taxCode;
     impiegato = _impiegato;
   }
-  
-  public Packet(String _action, List<Impiegato> _searched) {
+
+  public Packet(String _action, List<Impiegato> _searched)
+  {
     action = _action;
     searched = _searched;
   }
@@ -99,9 +100,14 @@ class Packet implements Serializable
   {
     return this.amministratore;
   }
-  
-  public String getTaxCode() {
+
+  public String getTaxCode()
+  {
     return this.taxCode;
   }
 
+  public List<Impiegato> getSearched()
+  {
+    return this.searched;
+  }
 }
