@@ -23,13 +23,12 @@ public class ConnectionHandler extends Thread
   @Override
   public void run()
   {
-    // Leggo da file e creo un gruppo di sedi ed un gruppo di impiegati.
-    List<Impiegato> employeesList = new ArrayList<Impiegato>(); // lista
-                                                                // impiegati
+    /* Leggo da file e creo un gruppo di sedi ed un gruppo di impiegati.
+    List<Impiegato> employeesList = new ArrayList<Impiegato>(); 
     List<Sede> HqList = new ArrayList<Sede>(); // lista sedi
     String[] data;
     String line;
-    BufferedReader csvReader;
+    BufferedReader csvReader;*/
 
     try
     {
@@ -52,16 +51,24 @@ public class ConnectionHandler extends Thread
             case "Add":
               oos.writeBoolean(AddUser(_p));
               break;
+            case "Modify":
+              oos.writeBoolean(ModUser(_p));
+              break;
+            case "Search":
+              oos.writeObject(new Packet("response", Search(_p)));
+              break;
+            default :
+              oos.writeUTF("Invalid request");
+              break;
           }
         }
       }
     }
     catch (IOException | ClassNotFoundException e)
     {
-      System.out.println("Could not read from stream");
+      System.out.println("Could not read from stream or invalid class");
       e.printStackTrace();
     }
-
   }
 
   public Impiegato LoginResponse(String _email, String _pwd)
@@ -216,4 +223,36 @@ public class ConnectionHandler extends Thread
     fo.close();
     return true;
   }
+
+  public List<Impiegato> Search(Packet _p){
+    List<Impiegato> _searched = new ArrayList<Impiegato>();
+
+    try
+    {
+      BufferedReader csvReader = new BufferedReader(
+          new FileReader("Impiegati.csv"));
+      String _row;
+      while ((_row = csvReader.readLine()) != null)
+      {
+        String[] _data = _row.split(",");
+        if(_data[4].equals(_p.getPwd())) {
+          Impiegato _user = new Impiegato(_data[0], _data[1], _data[2], _data[3],
+              _data[4], new SimpleDateFormat("dd/MM/yyyy").parse(_data[5]),
+              new SimpleDateFormat("dd/MM/yyyy").parse(_data[6]));
+          _searched.add(_user);
+        }
+      }
+      csvReader.close();
+      return _searched;
+    }
+    catch (IOException | ParseException e)
+    {
+      System.out.println("Could not open users in modify.");
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+
+
 }

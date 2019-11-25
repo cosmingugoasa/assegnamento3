@@ -71,6 +71,7 @@ public class Client
         
         employeesList = Search("Impiegato", oos, ois);
         // TODO: METODO CHE STAMPA OGNI ELEMENTO della lista
+        //TODO: AGGIUNGERE QUI CICLO DI STAMPA CON RISPOSTA DAL SERVER
       }
       else if (duser != null)
       {
@@ -192,8 +193,8 @@ public class Client
     {
       _oos.writeObject(_p);
 
-      // TODO: verificare che la lista non sia vuota e poi ritornarla Ritornare
-      // la lista
+      //TODO: verificare che la lista non sia NULL e poi stamparla
+      //TODO: inserire qui ciclo di stampa della risposta del server
     }
     catch (IOException e)
     {

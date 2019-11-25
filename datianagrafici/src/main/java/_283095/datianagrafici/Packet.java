@@ -1,6 +1,7 @@
 package _283095.datianagrafici;
 
 import java.io.Serializable;
+import java.util.List;
 
 @SuppressWarnings("serial")
 class Packet implements Serializable
@@ -13,6 +14,8 @@ class Packet implements Serializable
   private String email;
   private String pwd;
   private String taxCode;
+  //private String job;
+  private List<Impiegato> searched;
 
   // costruttore per aggiungere impiegato
   public Packet(String _action, Impiegato _Impiegato)
@@ -55,6 +58,11 @@ class Packet implements Serializable
     action = _action;
     taxCode = _taxCode;
     impiegato = _impiegato;
+  }
+  
+  public Packet(String _action, List<Impiegato> _searched) {
+    action = _action;
+    searched = _searched;
   }
 
   public String getAction()
