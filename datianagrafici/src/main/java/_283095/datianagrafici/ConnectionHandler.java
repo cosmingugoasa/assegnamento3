@@ -13,6 +13,7 @@ public class ConnectionHandler extends Thread
   public Socket socket;
   public DataInputStream inputStream;
   public DataOutputStream outputStream;
+  Boolean closed = false;
 
   public ConnectionHandler(Socket _s, DataInputStream _is, DataOutputStream _os)
   {
@@ -37,8 +38,8 @@ public class ConnectionHandler extends Thread
       ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
       System.out.println(inputStream.readUTF());
-      outputStream.writeUTF("Hi, i'm server");
-      while (true)
+      outputStream.writeUTF("Connected to server.");
+      while (closed == false)
       {
         Packet _p = (Packet) ois.readObject();
         if (_p != null)
@@ -60,7 +61,17 @@ public class ConnectionHandler extends Thread
             case "Search":
               oos.writeObject(new Packet("response", Search(_p)));
               break;
-            default :
+            case "Close":
+              closed = true;
+              System.out.println("Closing connection with client");
+              oos.writeObject(new Packet("Server closing connection."));
+              outputStream.close();
+              inputStream.close();
+              oos.close();
+              ois.close();
+              socket.close();
+              break;
+            default:
               oos.writeUTF("Invalid request");
               break;
           }
@@ -194,9 +205,12 @@ public class ConnectionHandler extends Thread
         {
           for (Impiegato _i : _users)
           {
-            fo.append(_i.name + "," + _i.surname + "," + _i.taxCode + ","
-                + _i.hqAddress + "," + _i.job + "," + _i.start + "," + _i.end
-                + "\n");
+
+            fo.append(_user.name + "," + _user.surname + "," + _user.taxCode
+                + "," + _user.hqAddress + "," + _user.job + ","
+                + new SimpleDateFormat("dd/MM/yyyy").format(_user.start) + ","
+                + new SimpleDateFormat("dd/MM/yyyy").format(_user.end) + ","
+                + _user.email + "," + _user.pwd + "\n");
           }
         }
         catch (IOException e)

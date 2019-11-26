@@ -65,6 +65,23 @@ class Packet implements Serializable
     searched = _searched;
   }
 
+  // Costruttore per ricerca
+  public Packet(String _action, String _Job)
+  {
+    action = _action;
+    job = _Job;
+  }
+  
+  public Packet(String _action, Boolean _value)
+  {
+    action = _action;
+    value = _value;
+  }
+  
+  public Packet(String _action) {
+    action = _action;
+  }
+  
   public String getAction()
   {
     return this.action;
