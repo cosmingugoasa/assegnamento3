@@ -16,6 +16,8 @@ public class Client
   static Socket server = null;
   static DataInputStream is = null;
   static DataOutputStream os = null;
+  static ObjectOutputStream oos;
+  static ObjectInputStream ois;
 
   Funzionario fuser = null;
   Dirigente duser = null;
@@ -33,10 +35,35 @@ public class Client
   }
 
   public static void main(String[] args)
-      throws ClassNotFoundException, IOException
+      throws ClassNotFoundException, IOException, ParseException
   {
-    @SuppressWarnings("unused")
-    Client client = new Client();
+    Client client1 = new Client();
+    Client client2 = new Client();
+    Client client3 = new Client();
+    client1.Login(oos, ois, "rr@gmail.com", "rr");
+    client2.Login(oos, ois, "rr", "rr");
+    client3.Login(oos, ois, "dax@gmail.com", "rr");
+    client1.AddImpiegato(
+        new Impiegato("Mario", "Rossi", "ertyuiolmnhgbvfc", "strada ugozzolo",
+            "Dirigente", new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
+            new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
+            "mario@gmail.com", "rr"),
+        oos, ois);
+    client2.Search("Funzionario", oos, ois);
+    client3
+        .ModifyImpiegato("mnbvcxzasdfghjkl",
+            new Impiegato("name", "_surname", "taxCode2", "_hqAddress",
+                "Operaio", new Date(), new Date(), "email@gmail.com", "pass"),
+            oos, ois);
+    client3
+    .ModifyImpiegato("mnbvcxzasdfghjkl",
+        new Impiegato("name", "_surname", "mnbvcxzaszfghjkl", "_hqAddress",
+            "Operaio", new Date(), new Date(), "email@gmail.com", "pass"),
+        oos, ois);
+    
+    client1.CloseConnection(oos, ois);
+    client2.CloseConnection(oos, ois);
+    client3.CloseConnection(oos, ois);
   }
 
   /*
@@ -50,30 +77,29 @@ public class Client
       server = new Socket(server_host, server_port);
       is = new DataInputStream(server.getInputStream());
       os = new DataOutputStream(server.getOutputStream());
-      ObjectOutputStream oos = new ObjectOutputStream(server.getOutputStream());
-      ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
+      oos = new ObjectOutputStream(server.getOutputStream());
+      ois = new ObjectInputStream(server.getInputStream());
 
       os.writeUTF("Hey ! I'm client " + new Random().nextInt(10));
       System.out.println(is.readUTF());
 
-      Login(oos, ois);
-
-      // TODO: tra una azione ed un altra implementare un tempo di attesa
-
+      /*
+      Login(oos, ois, email, pwd);
+      
       if (fuser != null)
       {
         AddImpiegato(new Impiegato("Mario", "g", "prova3", "fe", "Dirigente",
             new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
             new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
             "mario@gmail.com", "rr"), oos, ois);
-
+      
         ModifyImpiegato("prova",
             fuser.ModifyImpiegato("name", "_surname", "taxCode2", "_hqAddress",
                 "Operaio", new Date(), new Date(), "email@gmail.com", "pass"),
             oos, ois);
-
+      
         employeesList = Search("Operaio", oos, ois);
-
+      
       }
       else if (duser != null)
       {
@@ -88,21 +114,23 @@ public class Client
         employeesList = Search(auser.search("Dirigente"), oos, ois);
         employeesList = Search(auser.search("Amministratore"), oos, ois);
       }
-
+      
+      CloseConnection(oos, ois);
+      */
     }
     catch (IOException | ParseException e) // | ClassNotFoundException e)
     {
       System.out.println("Error connecting to server");
-      e.printStackTrace();
+      Connect();
     }
 
   }
 
-  public void Login(ObjectOutputStream _oos, ObjectInputStream _ois)
-      throws IOException
+  public void Login(ObjectOutputStream _oos, ObjectInputStream _ois,
+      String _email, String _pwd) throws IOException
   {
     System.out.println("\nTrying to login");
-    Packet _p = new Packet("Login", email, pwd);
+    Packet _p = new Packet("Login", _email, _pwd);
     _oos.writeObject(_p);
 
     try
@@ -146,7 +174,7 @@ public class Client
     }
     catch (ClassNotFoundException e)
     {
-      // TODO Auto-generated catch block
+      System.out.println("Login fallito");
       e.printStackTrace();
     }
 
@@ -155,11 +183,11 @@ public class Client
   public void AddImpiegato(Impiegato _impiegato, ObjectOutputStream _oos,
       ObjectInputStream _ois)
   {
+    System.out.println("\nInserimento Impiegato...");
     if (_impiegato.taxCode.length() == 16)
     {
       try
       {
-        System.out.println("\nTrying to add Impiegato");
         Packet _p = new Packet("Add", _impiegato);
         _oos.writeObject(_p);
 
@@ -174,17 +202,17 @@ public class Client
       }
     }
     else
-      System.out.println("\nErrore inserimento Codice Fiscale!!!");
+      System.out.println("\nInserimento fallito. Codice fiscale troppo corto.");
   }
 
   public void ModifyImpiegato(String _taxCode, Impiegato _impiegato,
       ObjectOutputStream _oos, ObjectInputStream _ois)
   {
-    if (_impiegato.taxCode.length() == 16)
+    System.out.println("\nTrying to modify Impiegato");
+    if (_impiegato.taxCode.length() == 16 && _taxCode.length() == 16)
     {
       try
       {
-        System.out.println("\nTrying to modify Impiegato");
         Packet _p = new Packet("Modify", _taxCode, _impiegato);
         _oos.writeObject(_p);
 
@@ -199,13 +227,13 @@ public class Client
       }
     }
     else
-      System.out.print("Errore inserimento Codice Fiscale");
+      System.out.print("Errore in Modifica. Codice fiscale troppo corto");
   }
 
   public List<Impiegato> Search(String _job, ObjectOutputStream _oos,
       ObjectInputStream _ois)
   {
-    System.out.println("\nTrying to Search by " + _job);
+    System.out.println("\nTento ricerca per : " + _job);
     Packet _p = new Packet("Search", _job);
     try
     {
@@ -223,7 +251,6 @@ public class Client
     }
     catch (IOException | ClassNotFoundException e)
     {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
@@ -238,4 +265,24 @@ public class Client
       item.printDetails();
     }
   }
+
+  public void CloseConnection(ObjectOutputStream _oos, ObjectInputStream _ois)
+      throws IOException
+  {
+    System.out.println("Chiusura connessione");
+    _oos.writeObject(new Packet("Close"));
+
+    try
+    {
+      System.out.println(((Packet) _ois.readObject()).getAction());
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+    os.close();
+    is.close();
+    server.close();
+  }
+
 }

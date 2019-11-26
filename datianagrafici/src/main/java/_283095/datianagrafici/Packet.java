@@ -82,6 +82,10 @@ class Packet implements Serializable
     value = _value;
   }
   
+  public Packet(String _action) {
+    action = _action;
+  }
+  
   public String getAction()
   {
     return this.action;
