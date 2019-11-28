@@ -3,10 +3,12 @@ package _283095.datianagrafici;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Server
 {
-
+  List<ConnectionHandler> clients = new ArrayList<ConnectionHandler>();
   static final int server_port = 7777;
 
   Server() throws Exception
@@ -30,20 +32,22 @@ public class Server
     ServerSocket server = new ServerSocket(server_port); // crea socket
     while (true)
     {
-      //aspetto che arrivi richiesta dal server
+      //aspetto che arrivi richiesta dal c
       Socket client = null;
-
+      DataInputStream _is = null;
+      DataOutputStream _os = null;
       try
       {
         client = server.accept();
-        DataInputStream _is = new DataInputStream(client.getInputStream());
-        DataOutputStream _os = new DataOutputStream(client.getOutputStream());
+        _is = new DataInputStream(client.getInputStream());
+        _os = new DataOutputStream(client.getOutputStream());
         
         System.out.println("new client : " + client);
-        
         // creo nuovo thread per il client che si è connesso
-        Thread _ch = new ConnectionHandler(client, _is, _os);
+        Thread _ch = new ConnectionHandler(clients.size(), client, _is, _os);
+        clients.add((ConnectionHandler) _ch);
         _ch.start();
+        System.out.println("total client : " + clients.size());
 
       }
       catch (IOException e)

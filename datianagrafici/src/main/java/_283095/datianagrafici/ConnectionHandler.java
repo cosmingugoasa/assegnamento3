@@ -10,13 +10,16 @@ import java.util.Random;
 
 public class ConnectionHandler extends Thread
 {
+  public int id;
   public Socket socket;
   public DataInputStream inputStream;
   public DataOutputStream outputStream;
   Boolean closed = false;
 
-  public ConnectionHandler(Socket _s, DataInputStream _is, DataOutputStream _os)
+  public ConnectionHandler(int _id, Socket _s, DataInputStream _is,
+      DataOutputStream _os)
   {
+    id = _id;
     socket = _s;
     inputStream = _is;
     outputStream = _os;
@@ -25,13 +28,6 @@ public class ConnectionHandler extends Thread
   @Override
   public void run()
   {
-    /* Leggo da file e creo un gruppo di sedi ed un gruppo di impiegati.
-    List<Impiegato> employeesList = new ArrayList<Impiegato>(); 
-    List<Sede> HqList = new ArrayList<Sede>(); // lista sedi
-    String[] data;
-    String line;
-    BufferedReader csvReader;*/
-
     try
     {
       ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
@@ -51,20 +47,26 @@ public class ConnectionHandler extends Thread
             case "Login":
               oos.writeObject(new Packet("response",
                   LoginResponse(_p.getEmail(), _p.getPwd())));
+              oos.flush();
               break;
             case "Add":
               oos.writeObject(new Packet("response", AddUser(_p)));
+              oos.flush();
               break;
             case "Modify":
               oos.writeObject(new Packet("response", ModUser(_p)));
+              oos.flush();
               break;
             case "Search":
               oos.writeObject(new Packet("response", Search(_p)));
+              oos.flush();
               break;
             case "Close":
               closed = true;
-              System.out.println("Closing connection with client");
+              System.out
+                  .println("[" + id + "]-" + "Closing connection with client");
               oos.writeObject(new Packet("Server closing connection."));
+              oos.flush();
               outputStream.close();
               inputStream.close();
               oos.close();
@@ -80,14 +82,16 @@ public class ConnectionHandler extends Thread
     }
     catch (IOException | ClassNotFoundException | InterruptedException e)
     {
-      System.out.println("Could not read from stream or invalid class");
+      System.out.println(
+          "[" + id + "]-" + "Could not read from stream or invalid class");
       e.printStackTrace();
     }
   }
 
   public Impiegato LoginResponse(String _email, String _pwd)
   {
-    System.out.println("trying to login with : " + _email + _pwd);
+    System.out
+        .println("[" + id + "]-" + "trying to login with : " + _email + _pwd);
     try
     {
       BufferedReader csvReader = new BufferedReader(
@@ -103,7 +107,6 @@ public class ConnectionHandler extends Thread
               data[4], new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
               new SimpleDateFormat("dd/MM/yyyy").parse(data[6]), data[7],
               data[8]);
-
           csvReader.close();
           return _logged;
         }
@@ -117,7 +120,8 @@ public class ConnectionHandler extends Thread
     }
     catch (ParseException e)
     {
-      System.out.println("Error parsin date from file on Login");
+      System.out
+          .println("[" + id + "]-" + "Error parsin date from file on Login");
     }
     return null;
   }
@@ -125,7 +129,8 @@ public class ConnectionHandler extends Thread
   public Boolean AddUser(Packet _p)
   {
     Impiegato _user = _p.getImpiegato();
-    System.out.println("trying to add : " + _user.taxCode + " " + _user.job);
+    System.out.println(
+        "[" + id + "]-" + "trying to add : " + _user.taxCode + " " + _user.job);
     try
     {
       if (!CheckTaxCode(_user.taxCode)) // Controllo che il taxCode non sia già
@@ -151,13 +156,14 @@ public class ConnectionHandler extends Thread
                   + _user.email + "," + _user.pwd + "\n");
               fo.close();
 
-              System.out.println("User added");
+              System.out.println("[" + id + "]-" + "User added");
               csvReader.close();
               return true;
             }
             catch (IOException e)
             {
-              System.out.println("Could not update quantity.");
+              System.out
+                  .println("[" + id + "]-" + "Could not update quantity.");
               return false;
             }
           }
@@ -168,7 +174,7 @@ public class ConnectionHandler extends Thread
     }
     catch (IOException e)
     {
-      System.out.println("Error adding user");
+      System.out.println("[" + id + "]-" + "Error adding user");
       return false;
     }
     return false;
@@ -213,7 +219,7 @@ public class ConnectionHandler extends Thread
     {
       if (item.taxCode.equals(_taxCode))
       {
-        System.out.println("Codice Fiscale gia' esistente");
+        System.out.println("[" + id + "]-" + "Codice Fiscale gia' esistente");
         return true;
       }
     }
@@ -225,8 +231,9 @@ public class ConnectionHandler extends Thread
 
     List<Impiegato> _users = new ArrayList<Impiegato>(GetList());
 
-    if (!CheckTaxCode(_p.getImpiegato().taxCode)) // Controllo che il taxCode non sia già
-                                        // presente
+    if (!CheckTaxCode(_p.getImpiegato().taxCode)) // Controllo che il taxCode
+                                                  // non sia già
+    // presente
     {
 
       FileWriter fo = new FileWriter("Impiegati.csv");
@@ -309,7 +316,7 @@ public class ConnectionHandler extends Thread
     }
     catch (IOException | ParseException e)
     {
-      System.out.println("Could not open users in modify.");
+      System.out.println("[" + id + "]-" + "Could not open users in modify.");
       e.printStackTrace();
       return null;
     }

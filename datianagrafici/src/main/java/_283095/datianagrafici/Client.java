@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-public class Client
+public class Client extends Thread
 {
   static final int server_port = 7777;
   static final String server_host = "localhost";
@@ -23,49 +23,70 @@ public class Client
   Dirigente duser = null;
   Amministratore auser = null;
 
-  String email = "rr@gmail.com";
-  String pwd = "rr";
+  String email;
+  String pwd;
 
   List<Impiegato> employeesList;
 
-  Client() throws ClassNotFoundException
+  Client(String _email, String _pwd) throws ClassNotFoundException
   {
     System.out.println("Client starting...");
-    Connect();
+    email = _email;
+    pwd = _pwd;
   }
 
-  public static void main(String[] args)
-      throws ClassNotFoundException, IOException, ParseException
+  @Override
+  public void run()
   {
-    Client client1 = new Client();
-    Client client2 = new Client();
-    Client client3 = new Client();
-    client1.Login(oos, ois, "rr@gmail.com", "rr");
-    /*client2.Login(oos, ois, "rr", "rr");
-    client3.Login(oos, ois, "dax@gmail.com", "rr");*/
-    client1.AddImpiegato(
-        new Impiegato("Mario", "Rossi", "ertyuiolmnhgbvfc", "strada ugozzolo",
-            "Dirigente", new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
+    Connect();
+    try
+    {
+      Login(oos, ois, email, pwd);
+      if (fuser != null)
+      {
+        AddImpiegato(new Impiegato("Mario", "Rossi", "poeftxzasdfghjkl", "strada ugozzolo", "Dirigente",
             new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
-            "mario@gmail.com", "rr"),
-        oos, ois);
-    /*client2.Search("Funzionario", oos, ois);
-    client3
-        .ModifyImpiegato("mnbvcxzasdfghjkl",
-            new Impiegato("name", "_surname", "taxCode2", "_hqAddress",
-                "Operaio", new Date(), new Date(), "email@gmail.com", "pass"),
+            new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
+            "marior@gmail.com", "rr"), oos, ois);
+
+        ModifyImpiegato("poeftxzasdfghjkl",
+            fuser.ModifyImpiegato("Mario", "Verdi", "poefqscvgledtkla", "strada ugozzolo",
+                "Operaio", new Date(), new Date(), "mariov@gmail.com", "pass"),
             oos, ois);
-    client3
-    .ModifyImpiegato("mnbvcxzasdfghjkl",
-        new Impiegato("name", "_surname", "mnbvcxzaszfghjkl", "_hqAddress",
-            "Operaio", new Date(), new Date(), "email@gmail.com", "pass"),
-        oos, ois);*/
-    
-    System.in.read();
-    
-    client1.CloseConnection(oos, ois);
-    //client2.CloseConnection(oos, ois);
-    //client3.CloseConnection(oos, ois);
+
+        employeesList = Search("Operaio", oos, ois);
+
+      }
+      else if (duser != null)
+      {
+        employeesList = Search(duser.search("Operaio"), oos, ois);
+        employeesList = Search(duser.search("Funzionario"), oos, ois);
+        // TODO: METODO CHE STAMPA OGNI ELEMENTO
+      }
+      else if (auser != null)
+      {
+        employeesList = Search(auser.search("Operaio"), oos, ois);
+        employeesList = Search(auser.search("Funzionario"), oos, ois);
+        employeesList = Search(auser.search("Dirigente"), oos, ois);
+        employeesList = Search(auser.search("Amministratore"), oos, ois);
+      }
+
+      CloseConnection(oos, ois);
+    }
+    catch (IOException | ParseException e)
+    {
+      System.out.println("Login fallito 1");
+      try
+      {
+        Login(oos, ois, "admin@gmail.com", "rr");
+      }
+      catch (IOException e1)
+      {
+        System.out.println("error2");
+        e1.printStackTrace();
+      }
+      e.printStackTrace();
+    }
   }
 
   /*
@@ -84,41 +105,6 @@ public class Client
 
       os.writeUTF("Hey ! I'm client " + new Random().nextInt(10));
       System.out.println(is.readUTF());
-
-      /*
-      Login(oos, ois, email, pwd);
-      
-      if (fuser != null)
-      {
-        AddImpiegato(new Impiegato("Mario", "g", "prova3", "fe", "Dirigente",
-            new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
-            new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
-            "mario@gmail.com", "rr"), oos, ois);
-      
-        ModifyImpiegato("prova",
-            fuser.ModifyImpiegato("name", "_surname", "taxCode2", "_hqAddress",
-                "Operaio", new Date(), new Date(), "email@gmail.com", "pass"),
-            oos, ois);
-      
-        employeesList = Search("Operaio", oos, ois);
-      
-      }
-      else if (duser != null)
-      {
-        employeesList = Search(duser.search("Operaio"), oos, ois);
-        employeesList = Search(duser.search("Funzionario"), oos, ois);
-        // TODO: METODO CHE STAMPA OGNI ELEMENTO
-      }
-      else if (auser != null)
-      {
-        employeesList = Search(auser.search("Operaio"), oos, ois);
-        employeesList = Search(auser.search("Funzionario"), oos, ois);
-        employeesList = Search(auser.search("Dirigente"), oos, ois);
-        employeesList = Search(auser.search("Amministratore"), oos, ois);
-      }
-      
-      CloseConnection(oos, ois);
-      */
     }
     catch (IOException e) // | ClassNotFoundException e)
     {
@@ -134,10 +120,15 @@ public class Client
     System.out.println("\nTrying to login");
     Packet _p = new Packet("Login", _email, _pwd);
     _oos.writeObject(_p);
+    _oos.flush();
 
     try
     {
       Impiegato _impiegato = ((Packet) _ois.readObject()).getImpiegato();
+      if(_impiegato == null) {
+        System.out.println("ritornato oggetto null");
+        return;
+      }
       switch (_impiegato.job)
       {
         case "Funzionario":
@@ -179,7 +170,6 @@ public class Client
       System.out.println("Login fallito");
       e.printStackTrace();
     }
-
   }
 
   public void AddImpiegato(Impiegato _impiegato, ObjectOutputStream _oos,
@@ -192,6 +182,7 @@ public class Client
       {
         Packet _p = new Packet("Add", _impiegato);
         _oos.writeObject(_p);
+        _oos.flush();
 
         if (((Packet) _ois.readObject()).value)
           System.out.println("\nUtente Inserito Correttamente!!!");
@@ -217,6 +208,7 @@ public class Client
       {
         Packet _p = new Packet("Modify", _taxCode, _impiegato);
         _oos.writeObject(_p);
+        _oos.flush();
 
         if (((Packet) _ois.readObject()).value)
           System.out.println("\nUtente Modificato Correttamente!!!");
@@ -240,12 +232,13 @@ public class Client
     try
     {
       _oos.writeObject(_p);
+      _oos.flush();
 
       employeesList = new ArrayList<Impiegato>(
           ((Packet) _ois.readObject()).getSearched());
       if (!employeesList.isEmpty())
       {
-        System.out.println("\nUtenti " + _job + " trovati: ");
+        System.out.println("\nUtenti " + _job + " trovati: " + employeesList.size());
         PrintList(employeesList);
       }
       else
@@ -273,6 +266,7 @@ public class Client
   {
     System.out.println("Chiusura connessione");
     _oos.writeObject(new Packet("Close"));
+    _oos.flush();
 
     try
     {
