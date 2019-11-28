@@ -41,15 +41,15 @@ public class Client
     Client client2 = new Client();
     Client client3 = new Client();
     client1.Login(oos, ois, "rr@gmail.com", "rr");
-    client2.Login(oos, ois, "rr", "rr");
-    client3.Login(oos, ois, "dax@gmail.com", "rr");
+    /*client2.Login(oos, ois, "rr", "rr");
+    client3.Login(oos, ois, "dax@gmail.com", "rr");*/
     client1.AddImpiegato(
         new Impiegato("Mario", "Rossi", "ertyuiolmnhgbvfc", "strada ugozzolo",
             "Dirigente", new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
             new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
             "mario@gmail.com", "rr"),
         oos, ois);
-    client2.Search("Funzionario", oos, ois);
+    /*client2.Search("Funzionario", oos, ois);
     client3
         .ModifyImpiegato("mnbvcxzasdfghjkl",
             new Impiegato("name", "_surname", "taxCode2", "_hqAddress",
@@ -59,11 +59,13 @@ public class Client
     .ModifyImpiegato("mnbvcxzasdfghjkl",
         new Impiegato("name", "_surname", "mnbvcxzaszfghjkl", "_hqAddress",
             "Operaio", new Date(), new Date(), "email@gmail.com", "pass"),
-        oos, ois);
+        oos, ois);*/
+    
+    System.in.read();
     
     client1.CloseConnection(oos, ois);
-    client2.CloseConnection(oos, ois);
-    client3.CloseConnection(oos, ois);
+    //client2.CloseConnection(oos, ois);
+    //client3.CloseConnection(oos, ois);
   }
 
   /*
@@ -118,7 +120,7 @@ public class Client
       CloseConnection(oos, ois);
       */
     }
-    catch (IOException | ParseException e) // | ClassNotFoundException e)
+    catch (IOException e) // | ClassNotFoundException e)
     {
       System.out.println("Error connecting to server");
       Connect();
