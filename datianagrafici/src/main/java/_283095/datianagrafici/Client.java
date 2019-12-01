@@ -61,6 +61,8 @@ public class Client
       email = String.valueOf(emailList.get(index));
       pwd = String.valueOf(pwdList.get(index));
       Login(oos, ois, email, pwd);
+      
+      //funzionario
       if (fuser != null)
       {
         AddImpiegato(new Impiegato("Mario", "Rossi", "mariorossiioiore",
@@ -75,15 +77,14 @@ public class Client
                 "mariov@gmail.com", "pass"),
             oos, ois);
 
-        employeesList = Search("Operaio", oos, ois);
-
       }
+      //dirigente
       else if (duser != null)
       {
         employeesList = Search(duser.search("Operaio"), oos, ois);
         employeesList = Search(duser.search("Funzionario"), oos, ois);
-        // TODO: METODO CHE STAMPA OGNI ELEMENTO
       }
+      //amministratore
       else if (auser != null)
       {
         employeesList = Search(auser.search("Operaio"), oos, ois);
