@@ -5,53 +5,74 @@ import java.net.Socket;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-public class Client extends Thread
+public class Client
 {
-  static final int server_port = 7777;
-  static final String server_host = "localhost";
-  static Socket server = null;
-  static DataInputStream is = null;
-  static DataOutputStream os = null;
-  static ObjectOutputStream oos;
-  static ObjectInputStream ois;
+  private static final int server_port = 7777;
+  private static final String server_host = "localhost";
+  private static Socket server = null;
+  private static ObjectOutputStream oos;
+  private static ObjectInputStream ois;
 
   Funzionario fuser = null;
   Dirigente duser = null;
   Amministratore auser = null;
+
+  List<String> emailList = new ArrayList<String>();
+  List<String> pwdList = new ArrayList<String>();
 
   String email;
   String pwd;
 
   List<Impiegato> employeesList;
 
-  Client(String _email, String _pwd) throws ClassNotFoundException
+  Client() throws ClassNotFoundException
   {
     System.out.println("Client starting...");
-    email = _email;
-    pwd = _pwd;
   }
 
-  @Override
+  public static void main(final String[] args)
+  {
+    try
+    {
+      new Client().run();
+    }
+    catch (ClassNotFoundException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   public void run()
   {
     Connect();
     try
     {
+      emailList = Arrays.asList("rr@gmail.com", "admin@gmail.com",
+          "dax@gmail.com", "mario@gmail.com");
+      pwdList = Arrays.asList("rr", "rr", "rr", "rr");
+      Random rand = new Random();
+      int index = rand.nextInt(emailList.size());
+      email = String.valueOf(emailList.get(index));
+      pwd = String.valueOf(pwdList.get(index));
       Login(oos, ois, email, pwd);
       if (fuser != null)
       {
-        AddImpiegato(new Impiegato("Mario", "Rossi", "poeftxzasdfghjkl", "strada ugozzolo", "Dirigente",
+        AddImpiegato(new Impiegato("Mario", "Rossi", "mariorossiioiore",
+            "strada ugozzolo", "Dirigente",
             new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
             new SimpleDateFormat("dd/MM/yyyy").parse("11/11/1998"),
             "marior@gmail.com", "rr"), oos, ois);
 
         ModifyImpiegato("poeftxzasdfghjkl",
-            fuser.ModifyImpiegato("Mario", "Verdi", "poefqscvgledtkla", "strada ugozzolo",
-                "Operaio", new Date(), new Date(), "mariov@gmail.com", "pass"),
+            fuser.ModifyImpiegato("Mario", "Verdi", "poefqscvgledtkla",
+                "strada ugozzolo", "Operaio", new Date(), new Date(),
+                "mariov@gmail.com", "pass"),
             oos, ois);
 
         employeesList = Search("Operaio", oos, ois);
@@ -75,16 +96,6 @@ public class Client extends Thread
     }
     catch (IOException | ParseException e)
     {
-      System.out.println("Login fallito 1");
-      try
-      {
-        Login(oos, ois, "admin@gmail.com", "rr");
-      }
-      catch (IOException e1)
-      {
-        System.out.println("error2");
-        e1.printStackTrace();
-      }
       e.printStackTrace();
     }
   }
@@ -98,22 +109,39 @@ public class Client extends Thread
     try
     {
       server = new Socket(server_host, server_port);
-      is = new DataInputStream(server.getInputStream());
-      os = new DataOutputStream(server.getOutputStream());
-      oos = new ObjectOutputStream(server.getOutputStream());
-      ois = new ObjectInputStream(server.getInputStream());
+      if (oos == null)
+        oos = new ObjectOutputStream(server.getOutputStream());
+      ois = null;
+      Packet request = new Packet("Hey ! I'm client ");
+      oos.writeObject(request);
+      oos.flush();
 
-      os.writeUTF("Hey ! I'm client " + new Random().nextInt(10));
-      System.out.println(is.readUTF());
+      if (ois == null)
+      {
+        ois = new ObjectInputStream(server.getInputStream());
+      }
+      Object o = ois.readObject();
+      if (o instanceof Packet)
+      {
+        Packet response = (Packet) o;
+        System.out.format("Client Recive form server: -%s-\n",
+            response.getAction());
+
+        if (response.getAction() == "close")
+        {
+          return;
+        }
+      }
+
     }
-    catch (IOException e) // | ClassNotFoundException e)
+    catch (IOException | ClassNotFoundException e)
     {
-      System.out.println("Error connecting to server");
-      Connect();
+      System.out.println("Error connecting to server\n");
     }
 
   }
 
+  // Funzione che invia una richiesta di login con email e pwd
   public void Login(ObjectOutputStream _oos, ObjectInputStream _ois,
       String _email, String _pwd) throws IOException
   {
@@ -122,10 +150,12 @@ public class Client extends Thread
     _oos.writeObject(_p);
     _oos.flush();
 
+    // Dopo Login si identifica un set i struzioni personalizzato per l'utente
     try
     {
       Impiegato _impiegato = ((Packet) _ois.readObject()).getImpiegato();
-      if(_impiegato == null) {
+      if (_impiegato == null)
+      {
         System.out.println("ritornato oggetto null");
         return;
       }
@@ -198,6 +228,7 @@ public class Client extends Thread
       System.out.println("\nInserimento fallito. Codice fiscale troppo corto.");
   }
 
+  // Funzione che invia una richiesta di modifica di un utente tramite taxCode
   public void ModifyImpiegato(String _taxCode, Impiegato _impiegato,
       ObjectOutputStream _oos, ObjectInputStream _ois)
   {
@@ -213,7 +244,8 @@ public class Client extends Thread
         if (((Packet) _ois.readObject()).value)
           System.out.println("\nUtente Modificato Correttamente!!!");
         else
-          System.out.println("\nErrore Modifca utente!!!");
+          System.out.println(
+              "\nErrore Modifca utente dati per modifica non corretti!!!");
       }
       catch (IOException | ClassNotFoundException e)
       {
@@ -238,7 +270,8 @@ public class Client extends Thread
           ((Packet) _ois.readObject()).getSearched());
       if (!employeesList.isEmpty())
       {
-        System.out.println("\nUtenti " + _job + " trovati: " + employeesList.size());
+        System.out
+            .println("\nUtenti " + _job + " trovati: " + employeesList.size());
         PrintList(employeesList);
       }
       else
@@ -261,6 +294,7 @@ public class Client extends Thread
     }
   }
 
+  // invio richiesta di chiusura della connessione
   public void CloseConnection(ObjectOutputStream _oos, ObjectInputStream _ois)
       throws IOException
   {
@@ -276,8 +310,7 @@ public class Client extends Thread
     {
       e.printStackTrace();
     }
-    os.close();
-    is.close();
+
     server.close();
   }
 

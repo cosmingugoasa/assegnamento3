@@ -3,9 +3,9 @@ package _283095.datianagrafici;
 import java.io.Serializable;
 import java.util.List;
 
-@SuppressWarnings("serial")
 class Packet implements Serializable
 {
+  private static final long serialVersionUID = 1L;
   private String action;
   private Impiegato impiegato;
   private Funzionario funzionario;
@@ -75,17 +75,20 @@ class Packet implements Serializable
     action = _action;
     job = _Job;
   }
-  
+
+  // costruttore per risposta esito modifica
   public Packet(String _action, Boolean _value)
   {
     action = _action;
     value = _value;
   }
-  
-  public Packet(String _action) {
+
+  // costruttore per comunicare solo stringhe
+  public Packet(String _action)
+  {
     action = _action;
   }
-  
+
   public String getAction()
   {
     return this.action;

@@ -6,6 +6,7 @@ import java.util.Date;
 public class Impiegato implements Serializable
 {
 
+  private static final long serialVersionUID = 1L;
   String name;
   String surname;
   String taxCode;

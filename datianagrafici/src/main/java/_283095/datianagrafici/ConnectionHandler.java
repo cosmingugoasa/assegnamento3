@@ -6,113 +6,170 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-public class ConnectionHandler extends Thread
+public class ConnectionHandler implements Runnable
 {
-  public int id;
+  private static final int sleepTime = 2000;
+  private static final int TimeOffServer = 10000;
+  String id;
+  private Server server;
   public Socket socket;
   public DataInputStream inputStream;
   public DataOutputStream outputStream;
+  ObjectInputStream ois = null;
+  ObjectOutputStream oos = null;
   Boolean closed = false;
+  File file = new File("Impiegati.csv");
 
-  public ConnectionHandler(int _id, Socket _s, DataInputStream _is,
-      DataOutputStream _os)
+  public ConnectionHandler(final Server s, final Socket _s)
   {
-    id = _id;
-    socket = _s;
-    inputStream = _is;
-    outputStream = _os;
+    this.server = s;
+    this.socket = _s;
   }
 
   @Override
   public void run()
   {
+    // assegno un id al thread
+    id = String.valueOf(this.hashCode());
+
     try
     {
-      ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-      ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+      if (ois == null)
+        ois = new ObjectInputStream(
+            new BufferedInputStream(socket.getInputStream()));
 
-      System.out.println(inputStream.readUTF());
-      outputStream.writeUTF("Connected to server.");
-      while (closed == false)
+      Object objetcInput = ois.readObject();
+      if (objetcInput instanceof Packet)
       {
-        Packet _p = (Packet) ois.readObject();
-        if (_p != null)
+        Packet request = (Packet) objetcInput;
+        System.out.format("Serve Thread %s recives from client: %s  \n", id,
+            request.getAction());
+        if (oos == null)
         {
-          Thread.sleep(new Random().nextInt((4000 - 1500) + 1) + 1500);
+          oos = new ObjectOutputStream(
+              new BufferedOutputStream(socket.getOutputStream()));
+        }
 
-          switch (_p.getAction())
+        Packet response = new Packet("Connessione Riuscita");
+        System.out.format("Server Thread %s sends to server: %s \n", id,
+            response.getAction());
+        oos.writeObject(response);
+        oos.flush();
+
+        // finche non ricevo un pacchetto di chiusura continuo a ricevere
+        while (!request.getAction().equals("Close"))
+        {
+          request = (Packet) ois.readObject();
+          if (request != null)
           {
-            case "Login":
-              oos.writeObject(new Packet("response",
-                  LoginResponse(_p.getEmail(), _p.getPwd())));
-              oos.flush();
-              break;
-            case "Add":
-              oos.writeObject(new Packet("response", AddUser(_p)));
-              oos.flush();
-              break;
-            case "Modify":
-              oos.writeObject(new Packet("response", ModUser(_p)));
-              oos.flush();
-              break;
-            case "Search":
-              oos.writeObject(new Packet("response", Search(_p)));
-              oos.flush();
-              break;
-            case "Close":
-              closed = true;
-              System.out
-                  .println("[" + id + "]-" + "Closing connection with client");
-              oos.writeObject(new Packet("Server closing connection."));
-              oos.flush();
-              outputStream.close();
-              inputStream.close();
-              oos.close();
-              ois.close();
-              socket.close();
-              break;
-            default:
-              oos.writeUTF("Invalid request");
-              break;
+            Thread.sleep(sleepTime); // pausa tra richieste
+
+            // classificazione della richiesta ricevuta
+            switch (request.getAction())
+            {
+              case "Login":
+                System.out.format(
+                    "Serve Thread %s recives request client: %s \n", id,
+                    request.getAction());
+                oos.writeObject(new Packet("response",
+                    LoginResponse(request.getEmail(), request.getPwd())));
+                oos.flush();
+                break;
+              case "Add":
+                System.out.format(
+                    "Serve Thread %s recives request client: %s \n", id,
+                    request.getAction());
+                oos.writeObject(new Packet("response", AddUser(request)));
+                oos.flush();
+                break;
+              case "Modify":
+                System.out.format(
+                    "Serve Thread %s recives request client: %s \n", id,
+                    request.getAction());
+                oos.writeObject(new Packet("response", ModUser(request)));
+                oos.flush();
+                break;
+              case "Search":
+                System.out.format(
+                    "Serve Thread %s recives request client: %s \n", id,
+                    request.getAction());
+                oos.writeObject(new Packet("response", Search(request)));
+                oos.flush();
+                break;
+              case "Close":
+                System.out.format(
+                    "Serve Thread %s recives request client: %s \n", id,
+                    request.getAction());
+                closed = true;
+                oos.writeObject(new Packet("Server closing connection."));
+                oos.flush();
+                oos.close();
+                ois.close();
+                /* Se dopo 10 secondi dall'ultimo client non si collega nessuno
+                * allora si spegne il server
+                */
+                Thread.sleep(TimeOffServer);
+                this.socket.close();
+                if (this.server.getPool().getActiveCount() == 1)
+                {
+                  this.server.close();
+                }
+                break;
+
+              default:
+                oos.writeUTF("Invalid request");
+                break;
+            }
           }
         }
+
       }
     }
     catch (IOException | ClassNotFoundException | InterruptedException e)
     {
-      System.out.println(
-          "[" + id + "]-" + "Could not read from stream or invalid class");
+      System.out.println("Could not read from stream or invalid class");
       e.printStackTrace();
+      return;
     }
   }
 
+  // Accede al file e controlla le credenziali restituendo l'impiegato
   public Impiegato LoginResponse(String _email, String _pwd)
   {
-    System.out
-        .println("[" + id + "]-" + "trying to login with : " + _email + _pwd);
+    System.out.println("trying to login with : " + _email + _pwd);
     try
     {
-      BufferedReader csvReader = new BufferedReader(
-          new FileReader("Impiegati.csv"));
-      String row;
-      while ((row = csvReader.readLine()) != null)
+      if (file.exists())// Controllo che il file esista
       {
-        String[] data = row.split(",");
-
-        if (data[7].equals(_email) && data[8].equals(_pwd))
+        System.out.println("File trovato \n");
+        // sincronizzazione del file fra thread
+        synchronized (file)
         {
-          Impiegato _logged = new Impiegato(data[0], data[1], data[2], data[3],
-              data[4], new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
-              new SimpleDateFormat("dd/MM/yyyy").parse(data[6]), data[7],
-              data[8]);
+
+          BufferedReader csvReader = new BufferedReader(new FileReader(file));
+          String row;
+          while ((row = csvReader.readLine()) != null)
+          {
+            String[] data = row.split(",");
+
+            if (data[7].equals(_email) && data[8].equals(_pwd))
+            {
+              Impiegato _logged = new Impiegato(data[0], data[1], data[2],
+                  data[3], data[4],
+                  new SimpleDateFormat("dd/MM/yyyy").parse(data[5]),
+                  new SimpleDateFormat("dd/MM/yyyy").parse(data[6]), data[7],
+                  data[8]);
+              csvReader.close();
+              return _logged;
+            }
+          }
           csvReader.close();
-          return _logged;
+          return null;
         }
       }
-      csvReader.close();
-      return null;
+      else
+        System.out.println("File non trovato \n");
     }
     catch (IOException e)
     {
@@ -120,66 +177,70 @@ public class ConnectionHandler extends Thread
     }
     catch (ParseException e)
     {
-      System.out
-          .println("[" + id + "]-" + "Error parsin date from file on Login");
+      System.out.println("Error parsin date from file on Login");
     }
     return null;
   }
 
+  // Accede al file e aggiunge l'Impiegato
   public Boolean AddUser(Packet _p)
   {
     Impiegato _user = _p.getImpiegato();
-    System.out.println(
-        "[" + id + "]-" + "trying to add : " + _user.taxCode + " " + _user.job);
+    System.out.println("trying to add : " + _user.taxCode + " " + _user.job);
     try
     {
-      if (!CheckTaxCode(_user.taxCode)) // Controllo che il taxCode non sia già
-                                        // presente
+      // Controllo che il taxCode non sia già presente
+      if (!CheckTaxCode(_user.taxCode))
       {
-        BufferedReader csvReader = new BufferedReader(
-            new FileReader("Impiegati.csv"));
-        String row;
-        while ((row = csvReader.readLine()) != null)
+        synchronized (file)
         {
-          String[] data = row.split(",");
 
-          if (!_user.taxCode.equals(data[2]))
+          BufferedReader csvReader = new BufferedReader(new FileReader(file));
+          String row;
+          Thread.sleep(sleepTime);
+          while ((row = csvReader.readLine()) != null)
           {
-            try
-            {
-              FileWriter fo = new FileWriter("Impiegati.csv", true);
+            String[] data = row.split(",");
 
-              fo.append(_user.name + "," + _user.surname + "," + _user.taxCode
-                  + "," + _user.hqAddress + "," + _user.job + ","
-                  + new SimpleDateFormat("dd/MM/yyyy").format(_user.start) + ","
-                  + new SimpleDateFormat("dd/MM/yyyy").format(_user.end) + ","
-                  + _user.email + "," + _user.pwd + "\n");
-              fo.close();
-
-              System.out.println("[" + id + "]-" + "User added");
-              csvReader.close();
-              return true;
-            }
-            catch (IOException e)
+            if (!_user.taxCode.equals(data[2]))
             {
-              System.out
-                  .println("[" + id + "]-" + "Could not update quantity.");
-              return false;
+              try
+              {
+                // apro file in scrittura per aggiungere utente
+                FileWriter fo = new FileWriter(file, true);
+
+                fo.append(_user.name + "," + _user.surname + "," + _user.taxCode
+                    + "," + _user.hqAddress + "," + _user.job + ","
+                    + new SimpleDateFormat("dd/MM/yyyy").format(_user.start)
+                    + "," + new SimpleDateFormat("dd/MM/yyyy").format(_user.end)
+                    + "," + _user.email + "," + _user.pwd + "\n");
+                fo.close();
+
+                System.out.println("User added");
+                csvReader.close();
+                return true;
+              }
+              catch (IOException e)
+              {
+                System.out.println("Could not update quantity.");
+                return false;
+              }
             }
           }
+          csvReader.close();
+          return false;
         }
-        csvReader.close();
-        return false;
       }
     }
-    catch (IOException e)
+    catch (IOException | InterruptedException e)
     {
-      System.out.println("[" + id + "]-" + "Error adding user");
+      System.out.println("Error adding user");
       return false;
     }
     return false;
   }
 
+  // si ottiene la lista degli impiegati dal file
   public List<Impiegato> GetList()
   {
     List<Impiegato> _users = new ArrayList<Impiegato>();
@@ -187,20 +248,23 @@ public class ConnectionHandler extends Thread
     String _row;
     try
     {
-      BufferedReader csvReader = new BufferedReader(
-          new FileReader("Impiegati.csv"));
-
-      while ((_row = csvReader.readLine()) != null)
+      synchronized (file)
       {
-        String[] _data = _row.split(",");
-        Impiegato _user = new Impiegato(_data[0], _data[1], _data[2], _data[3],
-            _data[4], new SimpleDateFormat("dd/MM/yyyy").parse(_data[5]),
-            new SimpleDateFormat("dd/MM/yyyy").parse(_data[6]), _data[7],
-            _data[8]);
-        _users.add(_user);
-      }
-      csvReader.close();
 
+        BufferedReader csvReader = new BufferedReader(new FileReader(file));
+
+        while ((_row = csvReader.readLine()) != null)
+        {
+          String[] _data = _row.split(",");
+          Impiegato _user = new Impiegato(_data[0], _data[1], _data[2],
+              _data[3], _data[4],
+              new SimpleDateFormat("dd/MM/yyyy").parse(_data[5]),
+              new SimpleDateFormat("dd/MM/yyyy").parse(_data[6]), _data[7],
+              _data[8]);
+          _users.add(_user);
+        }
+        csvReader.close();
+      }
     }
     catch (IOException | ParseException e)
     {
@@ -211,6 +275,7 @@ public class ConnectionHandler extends Thread
     return _users;
   }
 
+  // Controlla dalla lista degli utenti se taxCode è presente
   public Boolean CheckTaxCode(String _taxCode)
   {
     List<Impiegato> employees = new ArrayList<Impiegato>(GetList());
@@ -219,104 +284,110 @@ public class ConnectionHandler extends Thread
     {
       if (item.taxCode.equals(_taxCode))
       {
-        System.out.println("[" + id + "]-" + "Codice Fiscale gia' esistente");
+        System.out.println("Codice Fiscale gia' esistente");
         return true;
       }
     }
     return false;
   }
 
+  // Modifica l'utente dopo aver controllato che esista
   public Boolean ModUser(Packet _p) throws IOException
   {
-
     List<Impiegato> _users = new ArrayList<Impiegato>(GetList());
 
-    if (!CheckTaxCode(_p.getImpiegato().taxCode)) // Controllo che il taxCode
-                                                  // non sia già
-    // presente
+    // controllo che la modifica al taxCode non sia già presente
+    if (!CheckTaxCode(_p.getImpiegato().taxCode))
     {
-
-      FileWriter fo = new FileWriter("Impiegati.csv");
-      for (Impiegato _user : _users)
+      synchronized (file)
       {
-        if (!_user.taxCode.equals(_p.getTaxCode()))
-        {
-          try
-          {
 
-            fo.append(_user.name + "," + _user.surname + "," + _user.taxCode
-                + "," + _user.hqAddress + "," + _user.job + ","
-                + new SimpleDateFormat("dd/MM/yyyy").format(_user.start) + ","
-                + new SimpleDateFormat("dd/MM/yyyy").format(_user.end) + ","
-                + _user.email + "," + _user.pwd + "\n");
-          }
-          catch (IOException e)
-          {
-            e.printStackTrace();
-            fo.close();
-            return false;
-          }
-        }
-        else
+        FileWriter fo = new FileWriter(file);
+        for (Impiegato _user : _users)
         {
-          try
+          if (!_user.taxCode.equals(_p.getTaxCode()))
           {
-            // TODO Solo dove non non sono nulli cambio
-            fo.append(_p.getImpiegato().name + "," + _p.getImpiegato().surname
-                + "," + _p.getImpiegato().taxCode + ","
-                + _p.getImpiegato().hqAddress + "," + _p.getImpiegato().job
-                + ","
-                + new SimpleDateFormat("dd/MM/yyyy")
-                    .format(_p.getImpiegato().start)
-                + ","
-                + new SimpleDateFormat("dd/MM/yyyy")
-                    .format(_p.getImpiegato().end)
-                + "," + _p.getImpiegato().email + "," + _p.getImpiegato().pwd
-                + "\n");
+            try
+            {
+
+              fo.append(_user.name + "," + _user.surname + "," + _user.taxCode
+                  + "," + _user.hqAddress + "," + _user.job + ","
+                  + new SimpleDateFormat("dd/MM/yyyy").format(_user.start) + ","
+                  + new SimpleDateFormat("dd/MM/yyyy").format(_user.end) + ","
+                  + _user.email + "," + _user.pwd + "\n");
+            }
+            catch (IOException e)
+            {
+              e.printStackTrace();
+              fo.close();
+              return false;
+            }
           }
-          catch (IOException e)
+          else
           {
-            e.printStackTrace();
-            fo.close();
-            return false;
+            try
+            {
+              // TODO Solo dove non non sono nulli cambio
+              fo.append(_p.getImpiegato().name + "," + _p.getImpiegato().surname
+                  + "," + _p.getImpiegato().taxCode + ","
+                  + _p.getImpiegato().hqAddress + "," + _p.getImpiegato().job
+                  + ","
+                  + new SimpleDateFormat("dd/MM/yyyy")
+                      .format(_p.getImpiegato().start)
+                  + ","
+                  + new SimpleDateFormat("dd/MM/yyyy").format(
+                      _p.getImpiegato().end)
+                  + "," + _p.getImpiegato().email + "," + _p.getImpiegato().pwd
+                  + "\n");
+            }
+            catch (IOException e)
+            {
+              e.printStackTrace();
+              fo.close();
+              return false;
+            }
           }
         }
+        fo.close();
+        return true;
       }
-      fo.close();
-      return true;
     }
+    System.out.format(
+        "Serve Thread %s: Errore TaxCode già esistente per la modifica \n", id);
     return false;
   }
 
+  // Ricerca degli impiegati per il lavoro
   public List<Impiegato> Search(Packet _p)
   {
     List<Impiegato> _searched = new ArrayList<Impiegato>();
 
     try
     {
-      BufferedReader csvReader = new BufferedReader(
-          new FileReader("Impiegati.csv"));
-      String _row;
-      while ((_row = csvReader.readLine()) != null)
+      synchronized (file)
       {
-        String[] _data = _row.split(",");
-        if (_data[4].equals(_p.getJob()))
+        BufferedReader csvReader = new BufferedReader(new FileReader(file));
+        String _row;
+        while ((_row = csvReader.readLine()) != null)
         {
-          Impiegato _user = new Impiegato(_data[0], _data[1], _data[2],
-              _data[3], _data[4],
-              new SimpleDateFormat("dd/MM/yyyy").parse(_data[5]),
-              new SimpleDateFormat("dd/MM/yyyy").parse(_data[6]), _data[7],
-              _data[8]);
-          _searched.add(_user);
+          String[] _data = _row.split(",");
+          if (_data[4].equals(_p.getJob()))
+          {
+            Impiegato _user = new Impiegato(_data[0], _data[1], _data[2],
+                _data[3], _data[4],
+                new SimpleDateFormat("dd/MM/yyyy").parse(_data[5]),
+                new SimpleDateFormat("dd/MM/yyyy").parse(_data[6]), _data[7],
+                _data[8]);
+            _searched.add(_user);
+          }
         }
-      }
-      csvReader.close();
+        csvReader.close();
 
-      return _searched;
+        return _searched;
+      }
     }
     catch (IOException | ParseException e)
     {
-      System.out.println("[" + id + "]-" + "Could not open users in modify.");
       e.printStackTrace();
       return null;
     }

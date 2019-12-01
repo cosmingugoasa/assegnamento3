@@ -3,60 +3,71 @@ package _283095.datianagrafici;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class Server
 {
-  List<ConnectionHandler> clients = new ArrayList<ConnectionHandler>();
   static final int server_port = 7777;
-
-  Server() throws Exception
-  {
-    System.out.println("Server starting...");
-    Reply();
-  }
+  private ServerSocket server;
+  private ThreadPoolExecutor pool;
+  private static final int corePool = 5;
+  private static final int maxPool = 100;
+  private static final long idleTime = 5000;
 
   public static void main(String[] args) throws Exception
   {
-    @SuppressWarnings("unused")
-    Server server = new Server();
+    System.out.println("Server starting...");
+    new Server().run();
+    System.out.println("FINE");
+    System.exit(0);
   }
 
   /*
-   *il server aspetta che un client si connetta, dopodichè manda un stringa "Received"
+   *il server aspetta che un client si connetta.
+   *crea un thread che gestisca la connessione.
   */
-  public void Reply() throws Exception
+  private void run() throws Exception
   {
     System.out.println("Waiting for something to reply at...");
-    ServerSocket server = new ServerSocket(server_port); // crea socket
+    server = new ServerSocket(server_port); // crea socket
+    pool = new ThreadPoolExecutor(corePool, maxPool, idleTime,
+        TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
     while (true)
     {
-      //aspetto che arrivi richiesta dal c
-      Socket client = null;
-      DataInputStream _is = null;
-      DataOutputStream _os = null;
       try
       {
-        client = server.accept();
-        _is = new DataInputStream(client.getInputStream());
-        _os = new DataOutputStream(client.getOutputStream());
-        
+        Socket client = server.accept();
+        this.pool.execute(new ConnectionHandler(this, client));
         System.out.println("new client : " + client);
-        // creo nuovo thread per il client che si è connesso
-        Thread _ch = new ConnectionHandler(clients.size(), client, _is, _os);
-        clients.add((ConnectionHandler) _ch);
-        _ch.start();
-        System.out.println("total client : " + clients.size());
-
+        System.out.println("\nNUmeoro Thread:" + pool.getPoolSize());
+        // this.pool.shutdown();
       }
       catch (IOException e)
       {
-        System.out.println("closing");
-        server.close();
-        client.close();
-        e.printStackTrace();
+        System.out.println("CHIUSURA");
+        break;
       }
+    }
+  }
+
+  public ThreadPoolExecutor getPool()
+  {
+    return this.pool;
+  }
+
+  public void close()
+  {
+
+    try
+    {
+      this.server.close();
+
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
     }
   }
 }
