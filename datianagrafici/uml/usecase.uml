@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_acrnwBQ8EeqZqJGKDe2Uyw" name="useCase">
+  <packageImport xmi:type="uml:PackageImport" xmi:id="_aivMcBQ8EeqZqJGKDe2Uyw">
+    <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
+  </packageImport>
+  <packagedElement xmi:type="uml:Artifact" xmi:id="_oUByEBQ8EeqZqJGKDe2Uyw" name="Sistema" useCase="_P6kecBQ9EeqZqJGKDe2Uyw _il7KUBQ9EeqZqJGKDe2Uyw _l939kBQ9EeqZqJGKDe2Uyw _pbFEQBQ9EeqZqJGKDe2Uyw _s_YRcBQ9EeqZqJGKDe2Uyw _xzTTcBQ9EeqZqJGKDe2Uyw" fileName="">
+    <ownedUseCase xmi:type="uml:UseCase" xmi:id="_P6kecBQ9EeqZqJGKDe2Uyw" name="Login" subject="_oUByEBQ8EeqZqJGKDe2Uyw">
+      <extensionPoint xmi:type="uml:ExtensionPoint" xmi:id="_8P84gBQ9EeqZqJGKDe2Uyw" name="ExtensionPoint1"/>
+      <extensionPoint xmi:type="uml:ExtensionPoint" xmi:id="_-Zf-8BQ9EeqZqJGKDe2Uyw" name="ExtensionPoint2"/>
+      <extensionPoint xmi:type="uml:ExtensionPoint" xmi:id="_DDBu0BQ-EeqZqJGKDe2Uyw" name="ExtensionPoint3"/>
+      <extensionPoint xmi:type="uml:ExtensionPoint" xmi:id="_FNW4YRQ-EeqZqJGKDe2Uyw" name="ExtensionPoint4"/>
+    </ownedUseCase>
+    <ownedUseCase xmi:type="uml:UseCase" xmi:id="_il7KUBQ9EeqZqJGKDe2Uyw" name="Inserisci" subject="_oUByEBQ8EeqZqJGKDe2Uyw">
+      <extend xmi:type="uml:Extend" xmi:id="_8P8RcBQ9EeqZqJGKDe2Uyw" extendedCase="_P6kecBQ9EeqZqJGKDe2Uyw" extensionLocation="_8P84gBQ9EeqZqJGKDe2Uyw"/>
+      <extensionPoint xmi:type="uml:ExtensionPoint" xmi:id="__kX2oRQ9EeqZqJGKDe2Uyw" name="ExtensionPoint2"/>
+    </ownedUseCase>
+    <ownedUseCase xmi:type="uml:UseCase" xmi:id="_l939kBQ9EeqZqJGKDe2Uyw" name="Aggiorna" subject="_oUByEBQ8EeqZqJGKDe2Uyw">
+      <extend xmi:type="uml:Extend" xmi:id="_-ZfX4BQ9EeqZqJGKDe2Uyw" extendedCase="_P6kecBQ9EeqZqJGKDe2Uyw" extensionLocation="_-Zf-8BQ9EeqZqJGKDe2Uyw"/>
+      <extensionPoint xmi:type="uml:ExtensionPoint" xmi:id="_BFRosBQ-EeqZqJGKDe2Uyw" name="ExtensionPoint2"/>
+    </ownedUseCase>
+    <ownedUseCase xmi:type="uml:UseCase" xmi:id="_pbFEQBQ9EeqZqJGKDe2Uyw" name="Fallito" subject="_oUByEBQ8EeqZqJGKDe2Uyw">
+      <extend xmi:type="uml:Extend" xmi:id="__kX2oBQ9EeqZqJGKDe2Uyw" extendedCase="_il7KUBQ9EeqZqJGKDe2Uyw" extensionLocation="__kX2oRQ9EeqZqJGKDe2Uyw"/>
+      <extend xmi:type="uml:Extend" xmi:id="_BFRBoBQ-EeqZqJGKDe2Uyw" extendedCase="_l939kBQ9EeqZqJGKDe2Uyw" extensionLocation="_BFRosBQ-EeqZqJGKDe2Uyw"/>
+    </ownedUseCase>
+    <ownedUseCase xmi:type="uml:UseCase" xmi:id="_s_YRcBQ9EeqZqJGKDe2Uyw" name="Ricerca (escluso su amministratore)" subject="_oUByEBQ8EeqZqJGKDe2Uyw">
+      <extend xmi:type="uml:Extend" xmi:id="_DDBHwBQ-EeqZqJGKDe2Uyw" extendedCase="_P6kecBQ9EeqZqJGKDe2Uyw" extensionLocation="_DDBu0BQ-EeqZqJGKDe2Uyw"/>
+    </ownedUseCase>
+    <ownedUseCase xmi:type="uml:UseCase" xmi:id="_xzTTcBQ9EeqZqJGKDe2Uyw" name="Ricerca completa" subject="_oUByEBQ8EeqZqJGKDe2Uyw">
+      <extend xmi:type="uml:Extend" xmi:id="_FNW4YBQ-EeqZqJGKDe2Uyw" extendedCase="_P6kecBQ9EeqZqJGKDe2Uyw" extensionLocation="_FNW4YRQ-EeqZqJGKDe2Uyw"/>
+    </ownedUseCase>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Actor" xmi:id="_w68kkBQ8EeqZqJGKDe2Uyw" name="Impiegato"/>
+  <packagedElement xmi:type="uml:Actor" xmi:id="_1Fw_MBQ8EeqZqJGKDe2Uyw" name="Operaio">
+    <generalization xmi:type="uml:Generalization" xmi:id="_BvWV4BQ9EeqZqJGKDe2Uyw" general="_w68kkBQ8EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Actor" xmi:id="_3NCNsBQ8EeqZqJGKDe2Uyw" name="Funzionario">
+    <generalization xmi:type="uml:Generalization" xmi:id="_CwUqsBQ9EeqZqJGKDe2Uyw" general="_w68kkBQ8EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Actor" xmi:id="_7AGPoBQ8EeqZqJGKDe2Uyw" name="Dirigente">
+    <generalization xmi:type="uml:Generalization" xmi:id="_Fg1qgBQ9EeqZqJGKDe2Uyw" general="_w68kkBQ8EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Actor" xmi:id="_9XPGIBQ8EeqZqJGKDe2Uyw" name="Amministratore">
+    <generalization xmi:type="uml:Generalization" xmi:id="_GRN-kBQ9EeqZqJGKDe2Uyw" general="_w68kkBQ8EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_VNnscBQ9EeqZqJGKDe2Uyw" memberEnd="_VNqIsBQ9EeqZqJGKDe2Uyw _VNrW0BQ9EeqZqJGKDe2Uyw">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VNphoBQ9EeqZqJGKDe2Uyw" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VNphoRQ9EeqZqJGKDe2Uyw" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_VNqIsBQ9EeqZqJGKDe2Uyw" name="login" type="_P6kecBQ9EeqZqJGKDe2Uyw" association="_VNnscBQ9EeqZqJGKDe2Uyw"/>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_VNrW0BQ9EeqZqJGKDe2Uyw" name="impiegato" type="_w68kkBQ8EeqZqJGKDe2Uyw" association="_VNnscBQ9EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Actor" xmi:id="_2mmqYBQ9EeqZqJGKDe2Uyw" name="Server"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_LLEM8BQ-EeqZqJGKDe2Uyw" memberEnd="_LLE0AhQ-EeqZqJGKDe2Uyw _LLE0AxQ-EeqZqJGKDe2Uyw">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LLE0ABQ-EeqZqJGKDe2Uyw" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LLE0ARQ-EeqZqJGKDe2Uyw" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_LLE0AhQ-EeqZqJGKDe2Uyw" name="inserisci" type="_il7KUBQ9EeqZqJGKDe2Uyw" association="_LLEM8BQ-EeqZqJGKDe2Uyw"/>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_LLE0AxQ-EeqZqJGKDe2Uyw" name="funzionario" type="_3NCNsBQ8EeqZqJGKDe2Uyw" association="_LLEM8BQ-EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_MI01sBQ-EeqZqJGKDe2Uyw" memberEnd="_MI01sxQ-EeqZqJGKDe2Uyw _MI1cwBQ-EeqZqJGKDe2Uyw">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_MI01sRQ-EeqZqJGKDe2Uyw" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MI01shQ-EeqZqJGKDe2Uyw" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_MI01sxQ-EeqZqJGKDe2Uyw" name="aggiorna" type="_l939kBQ9EeqZqJGKDe2Uyw" association="_MI01sBQ-EeqZqJGKDe2Uyw"/>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_MI1cwBQ-EeqZqJGKDe2Uyw" name="funzionario" type="_3NCNsBQ8EeqZqJGKDe2Uyw" association="_MI01sBQ-EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_Ojln8BQ-EeqZqJGKDe2Uyw" memberEnd="_OjmPAhQ-EeqZqJGKDe2Uyw _OjmPAxQ-EeqZqJGKDe2Uyw">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_OjmPABQ-EeqZqJGKDe2Uyw" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OjmPARQ-EeqZqJGKDe2Uyw" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_OjmPAhQ-EeqZqJGKDe2Uyw" name="ricerca (escluso su amministratore)" type="_s_YRcBQ9EeqZqJGKDe2Uyw" association="_Ojln8BQ-EeqZqJGKDe2Uyw"/>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_OjmPAxQ-EeqZqJGKDe2Uyw" name="dirigente" type="_7AGPoBQ8EeqZqJGKDe2Uyw" association="_Ojln8BQ-EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_QCkHYBQ-EeqZqJGKDe2Uyw" memberEnd="_QCkHYxQ-EeqZqJGKDe2Uyw _QCkucBQ-EeqZqJGKDe2Uyw">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QCkHYRQ-EeqZqJGKDe2Uyw" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QCkHYhQ-EeqZqJGKDe2Uyw" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_QCkHYxQ-EeqZqJGKDe2Uyw" name="ricerca completa" type="_xzTTcBQ9EeqZqJGKDe2Uyw" association="_QCkHYBQ-EeqZqJGKDe2Uyw"/>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_QCkucBQ-EeqZqJGKDe2Uyw" name="amministratore" type="_9XPGIBQ8EeqZqJGKDe2Uyw" association="_QCkHYBQ-EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_ReD1ABQ-EeqZqJGKDe2Uyw" memberEnd="_ReEcEhQ-EeqZqJGKDe2Uyw _ReEcExQ-EeqZqJGKDe2Uyw">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ReEcEBQ-EeqZqJGKDe2Uyw" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ReEcERQ-EeqZqJGKDe2Uyw" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_ReEcEhQ-EeqZqJGKDe2Uyw" name="login" type="_oUByEBQ8EeqZqJGKDe2Uyw" association="_ReD1ABQ-EeqZqJGKDe2Uyw"/>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_ReEcExQ-EeqZqJGKDe2Uyw" name="server" type="_2mmqYBQ9EeqZqJGKDe2Uyw" association="_ReD1ABQ-EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_SWqQ8BQ-EeqZqJGKDe2Uyw" memberEnd="_SWq4ABQ-EeqZqJGKDe2Uyw _SWq4ARQ-EeqZqJGKDe2Uyw">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_SWqQ8RQ-EeqZqJGKDe2Uyw" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SWqQ8hQ-EeqZqJGKDe2Uyw" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_SWq4ABQ-EeqZqJGKDe2Uyw" name="ricerca (escluso su amministratore)" type="_s_YRcBQ9EeqZqJGKDe2Uyw" association="_SWqQ8BQ-EeqZqJGKDe2Uyw"/>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_SWq4ARQ-EeqZqJGKDe2Uyw" name="server" type="_2mmqYBQ9EeqZqJGKDe2Uyw" association="_SWqQ8BQ-EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_TUHXsBQ-EeqZqJGKDe2Uyw" memberEnd="_TUH-whQ-EeqZqJGKDe2Uyw _TUH-wxQ-EeqZqJGKDe2Uyw">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_TUH-wBQ-EeqZqJGKDe2Uyw" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TUH-wRQ-EeqZqJGKDe2Uyw" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_TUH-whQ-EeqZqJGKDe2Uyw" name="ricerca completa" type="_xzTTcBQ9EeqZqJGKDe2Uyw" association="_TUHXsBQ-EeqZqJGKDe2Uyw"/>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_TUH-wxQ-EeqZqJGKDe2Uyw" name="server" type="_2mmqYBQ9EeqZqJGKDe2Uyw" association="_TUHXsBQ-EeqZqJGKDe2Uyw"/>
+  </packagedElement>
+</uml:Model>
